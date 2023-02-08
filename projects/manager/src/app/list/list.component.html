@@ -1,0 +1,20 @@
+<div *ngFor="let item of list"
+     #div
+     class="item"
+     tabindex="-1"
+     (dblclick)="onItemDoubleClick()"
+     (mousedown)="onItemDown(item, $event)"
+     (contextmenu)="$event.preventDefault()"
+     [ngClass]="{'edited-item': item == editedItem,
+                 'selected-item': item == selectedItem,
+                 'unselected-item': item == unselectedItem,
+                 'selected-item-all': item.selectType == SelectType.All,
+                 'selected-item-top': item.selectType == SelectType.Top,
+                 'selected-item-middle': item.selectType == SelectType.Middle,
+                 'selected-item-bottom': item.selectType == SelectType.Bottom,
+                 'disabled-item': (editedItem && editedItem != item) || item.disabled}">
+    
+    <div style="margin-left: -1px;">
+        {{item.name}}
+    </div>
+</div>
