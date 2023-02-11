@@ -1,11 +1,11 @@
 export class ListOptions {
+    indent: number = 5;
     cursor: string = 'auto';
-    editable: boolean = true;
+    editable: boolean = false;
     sortable: boolean = true;
     deletable: boolean = true;
     selectable: boolean = true;
     unselectable: boolean = true;
     showSelection: boolean = true;
     multiselectable: boolean = true;
-    checkForDuplicates: boolean = true;
 }

@@ -1,1 +1,7 @@
-<list [list]="alitaList"></list>
+<button style="margin-bottom: 20px;" (click)="trumpy()">Trumpy</button>
+
+<list #list
+      [list]="alitaList"
+      (itemEditedEvent)="onItemEditedEvent($event)"
+      (itemSelectedEvent)="onItemSelectedEvent($event)">
+</list>

@@ -1,7 +1,5 @@
 <div *ngFor="let item of list"
-     #div
      class="item"
-     tabindex="-1"
      (dblclick)="onItemDoubleClick()"
      (mousedown)="onItemDown(item, $event)"
      (contextmenu)="$event.preventDefault()"
@@ -13,8 +11,16 @@
                  'selected-item-middle': item.selectType == SelectType.Middle,
                  'selected-item-bottom': item.selectType == SelectType.Bottom,
                  'disabled-item': (editedItem && editedItem != item) || item.disabled}">
+
+    <div class="indent"
+         [style.width.px]="options.indent - 2">
+    </div>
     
-    <div style="margin-left: -1px;">
+    <div #div
+         tabindex="-1"
+         class="item-name"
+         [contentEditable]="item == editedItem"
+         [ngClass]="{'edited-item-name': item == editedItem}">
         {{item.name}}
     </div>
 </div>

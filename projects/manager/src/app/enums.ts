@@ -4,3 +4,11 @@ export enum ItemSelectType {
     Middle,
     Bottom
 }
+
+
+
+export enum CaseType {
+    LowerCase,
+    CapitalizedCase,
+    TitleCase
+}

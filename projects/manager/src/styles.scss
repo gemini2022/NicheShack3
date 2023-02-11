@@ -12,3 +12,9 @@ body {
 * {
     box-sizing: border-box;
 }
+
+
+::selection {
+    color: #ffffff;
+    background: #998200;
+}
