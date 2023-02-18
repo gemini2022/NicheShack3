@@ -1,26 +1,33 @@
-<div *ngFor="let item of list"
-     class="item"
-     (dblclick)="onItemDoubleClick()"
-     (mousedown)="onItemDown(item, $event)"
-     (contextmenu)="$event.preventDefault()"
-     [ngClass]="{'edited-item': item == editedItem,
-                 'selected-item': item == selectedItem,
-                 'unselected-item': item == unselectedItem,
-                 'selected-item-all': item.selectType == SelectType.All,
-                 'selected-item-top': item.selectType == SelectType.Top,
-                 'selected-item-middle': item.selectType == SelectType.Middle,
-                 'selected-item-bottom': item.selectType == SelectType.Bottom,
-                 'disabled-item': (editedItem && editedItem != item) || item.disabled}">
+<div #listContainer
+     class="list-container"
+     (mousedown)="onListMouseDown($event)">
 
-    <div class="indent"
-         [style.width.px]="options.indent - 2">
-    </div>
-    
-    <div #div
-         tabindex="-1"
-         class="item-name"
-         [contentEditable]="item == editedItem"
-         [ngClass]="{'edited-item-name': item == editedItem}">
-        {{item.name}}
-    </div>
+     <div *ngFor="let item of list"
+          #htmlItem
+          class="item"
+          tabindex="-1"
+          (dblclick)="onItemDoubleClick()"
+          (mousedown)="onItemDown(item, $event)"
+          (contextmenu)="$event.preventDefault()"
+          [ngClass]="{'edited-item': item == editedItem,
+                      'selected-item': item == selectedItem,
+                      'unselected-item': item == unselectedItem,
+                      'selected-item-all': item.selectType == SelectType.All,
+                      'selected-item-top': item.selectType == SelectType.Top,
+                      'selected-item-middle': item.selectType == SelectType.Middle,
+                      'selected-item-bottom': item.selectType == SelectType.Bottom,
+                      'disabled-item': (editedItem && editedItem != item) || item.disabled}">
+
+          <div class="indent"
+               [style.width.px]="options.indent - 2">
+          </div>
+     
+          <div #htmlItemName
+               tabindex="-1"
+               class="item-name"
+               [contentEditable]="item == editedItem"
+               [ngClass]="{'edited-item-name': item == editedItem}">
+               {{item.name}}
+          </div>
+     </div>
 </div>

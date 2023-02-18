@@ -8,4 +8,5 @@ export class ListOptions {
     unselectable: boolean = true;
     showSelection: boolean = true;
     multiselectable: boolean = true;
+    noSelectOnArrowKey: boolean = true;
 }

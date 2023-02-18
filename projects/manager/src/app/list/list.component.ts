@@ -1,7 +1,7 @@
-import { Component, ElementRef, EventEmitter, Input, Output, QueryList, ViewChildren } from '@angular/core';
-import { CaseType, ItemSelectType } from '../enums';
 import { ListItem } from '../list-item';
 import { ListOptions } from '../list-options';
+import { CaseType, ItemSelectType } from '../enums';
+import { Component, ElementRef, EventEmitter, Input, Output, QueryList, ViewChild, ViewChildren } from '@angular/core';
 
 @Component({
   selector: 'list',
@@ -18,6 +18,7 @@ export class ListComponent {
   private _selectedItem!: ListItem;
   private _unselectedItem!: ListItem;
   private eventListenersAdded!: boolean;
+  private stopMouseDownPropagation!: boolean;
 
   // Public
   public SelectType = ItemSelectType;
@@ -28,14 +29,22 @@ export class ListComponent {
   // Decorators
   @Input() public list!: Array<ListItem>;
   @Input() public options: ListOptions = new ListOptions();
-  @ViewChildren('div') private divs!: QueryList<ElementRef<HTMLElement>>;
-  @Output() public itemEditedEvent: EventEmitter<ListItem> = new EventEmitter();
-  @Output() public itemSelectedEvent: EventEmitter<Array<ListItem>> = new EventEmitter();
+  @ViewChild('listContainer') listContainer!: ElementRef<HTMLElement>;
+  @ViewChildren('htmlItem') private htmlItems!: QueryList<ElementRef<HTMLElement>>;
+  @ViewChildren('htmlItemName') private htmlItemNames!: QueryList<ElementRef<HTMLElement>>;
+
+  // Events
+  @Output() public editedItemEvent: EventEmitter<ListItem> = new EventEmitter();
+  @Output() public rightClickedItemEvent: EventEmitter<ListItem> = new EventEmitter();
+  @Output() public deletedItemsEvent: EventEmitter<Array<ListItem>> = new EventEmitter();
+  @Output() public selectedItemsEvent: EventEmitter<Array<ListItem>> = new EventEmitter();
+  @Output() public pressedDeleteKeyEvent: EventEmitter<Array<ListItem>> = new EventEmitter();
 
 
   private ngAfterViewInit(): void {
     this.list.forEach((x, i) => {
-      x.div = this.divs.get(i)?.nativeElement;
+      x.htmlItem = this.htmlItems.get(i)?.nativeElement;
+      x.htmlItemName = this.htmlItemNames.get(i)?.nativeElement;
     })
   }
 
@@ -52,7 +61,7 @@ export class ListComponent {
 
 
 
-  private removeEventListeners(): void {
+  private reinitializeList(): void {
     if (this.options.unselectable) {
       this.pivotItem = null!;
       this._editedItem = null!;
@@ -114,7 +123,7 @@ export class ListComponent {
 
           // But if the array has only one element (that would mean a list was (NOT) pasted in)
         } else {
-          // this.getHtmlItem().innerText = clipboardData;
+          this.getHtmlItemName().innerText = clipboardData;
         }
       }
     }
@@ -124,10 +133,10 @@ export class ListComponent {
 
   private onKeyDown = (e: KeyboardEvent): void => {
     if (e.key === 'Enter') this.onEnter(e);
-    if (e.key === 'Delete') this.onDelete();
     if (e.key === 'Escape') this.onEscape();
-    if (e.key === 'ArrowUp') this.onArrowUp();
-    if (e.key === 'ArrowDown') this.onArrowDown();
+    if (e.key === 'ArrowUp') this.onArrowUp(e);
+    if (e.key === 'ArrowDown') this.onArrowDown(e);
+    if (e.key === 'Delete') this.emitPressedDeleteKey();
 
     if (this.options.multiselectable) {
       if (e.key === 'Shift') this.shiftKeyDown = true;
@@ -138,20 +147,35 @@ export class ListComponent {
 
 
   private onMouseDown = (): void => {
-    // If an item is being edited or added
-    if (this._editedItem) {
+    // As long as a mouse-down on an item did (NOT) just occur
+    if (!this.stopMouseDownPropagation) {
 
-      // Evaluate the state of the edit and then act accordingly
-      this.exitItemEdit(null!, true);
+      // If an item is being edited or added
+      if (this._editedItem) {
 
-      // If an item is (NOT) being edited
+        // Evaluate the state of the edit and then act accordingly
+        this.exitItemEdit(null!, true);
+
+        // If an item is (NOT) being edited
+      } else {
+
+        // Then reinitialize the list
+        this.reinitializeList();
+      }
+
+      // If a mouse-down on an item did just occur
     } else {
-
-      // Remove all listeners and selections
-      this.removeEventListeners();
+      this.stopMouseDownPropagation = false;
     }
   }
 
+
+
+  onListMouseDown(e: MouseEvent) {
+    if (e.clientX > this.listContainer.nativeElement.clientWidth) {
+      this.stopMouseDownPropagation = true;
+    }
+  }
 
 
   private onEnter(e: KeyboardEvent): void {
@@ -166,11 +190,6 @@ export class ListComponent {
 
 
 
-  private onDelete(): void {
-
-  }
-
-
 
   private onEscape(): void {
     // If an item is being edited
@@ -182,34 +201,45 @@ export class ListComponent {
       // If an item is NOT being edited
     } else {
 
-      // Then remove all listeners and selections
-      this.removeEventListeners();
+      // Then reinitialize the list
+      this.reinitializeList();
     }
   }
 
-  private onArrowDown(): void {
+  private onArrowDown(e: KeyboardEvent): void {
+    e.preventDefault();
+    let index: number = this._selectedItem ? this.list.indexOf(this._selectedItem) : this._unselectedItem ? this.list.indexOf(this._unselectedItem) : -1;
 
+    index++;
+    if (index > this.list.length - 1) index = 0;
+    this.setItemSelection(this.list[index]);
+    this.list[index].htmlItem?.focus();
   }
 
 
-  private onArrowUp(): void {
+  private onArrowUp(e: KeyboardEvent): void {
+    e.preventDefault();
+    let index: number = this._selectedItem ? this.list.indexOf(this._selectedItem) : this._unselectedItem ? this.list.indexOf(this._unselectedItem) : this.list.length;
 
+    index--;
+    if (index < 0) index = this.list.length - 1;
+    this.setItemSelection(this.list[index]);
+    this.list[index].htmlItem?.focus();
   }
 
 
   public onItemDown(item: ListItem, e?: MouseEvent): void {
-    if (e) e!.stopPropagation()
+    this.stopMouseDownPropagation = true;
 
     // As long as the item that just received this mouse down is (NOT) currently being edited
     if (this._editedItem != item) {
-      
+
       // If another item is being edited, remove it from edit mode
       if (this._editedItem) this.exitItemEdit(null!, true);
 
       // If this item is being selected from a right mouse down
-      if (e != null && e.button == 2) {
-
-
+      if (e && e.button == 2) {
+        this.rightClickedItemEvent.emit(item);
       }
 
       // As long as the list is selectable and the item itself is selectable
@@ -226,8 +256,11 @@ export class ListComponent {
           }
         }
 
+        // If the list is (NOT) selectable and the item itself is (NOT) selectable
       } else {
-        this.removeEventListeners();
+
+        // Then reinitialize the list
+        this.reinitializeList();
       }
     }
   }
@@ -269,11 +302,11 @@ export class ListComponent {
     this.setItemsSelectType();
 
 
-    this.emitItemSelected();
+    this.emitItemsSelected();
   }
 
 
-  
+
 
   private setSelectedItemsShiftKey(): void {
     // Clear the selection for all items
@@ -318,6 +351,7 @@ export class ListComponent {
         this._selectedItem.selectType = null!;
         this._unselectedItem = this._selectedItem;
         this._selectedItem = null!;
+        this.pivotItem = this._unselectedItem;
       }
 
       // If the item we are pressing down on is NOT yet selected
@@ -326,9 +360,8 @@ export class ListComponent {
       // Select that item
       this._unselectedItem = null!;
       this._selectedItem.selected = true;
+      this.pivotItem = this._selectedItem;
     }
-    // Define the pivot item
-    this.pivotItem = this._selectedItem;
   }
 
 
@@ -489,9 +522,10 @@ export class ListComponent {
       this._editedItem = this.list[0];
 
       window.setTimeout(() => {
-        this.list[0].div = this.divs.get(0)?.nativeElement;
-        this._editedItem.div!.innerText = this._editedItem.div!.innerText?.trim()!;
-        this.setItemFocus();
+        this.list[0].htmlItem = this.htmlItems.get(0)?.nativeElement;
+        this.list[0].htmlItemName = this.htmlItemNames.get(0)?.nativeElement;
+        this._editedItem.htmlItemName!.innerText = this._editedItem.htmlItemName!.innerText?.trim()!;
+        this.giveFocusToHtmlItemName();
       });
 
       // If the list is (NOT) Editable
@@ -499,12 +533,12 @@ export class ListComponent {
 
       // Add the new item to the bottom of the list
       this.list.push({ id: id!, name: name! });
-
+      // Define it as the new item
       const newItem = this.list[this.list.length - 1];
 
       newItem.selected = true;
-      this._selectedItem = newItem;
       this._editedItem = null!;
+      this._selectedItem = newItem;
       this._unselectedItem = null!;
 
       // As long as the list is set to be sortable
@@ -513,16 +547,23 @@ export class ListComponent {
         this.list.sort((a, b) => (a.name! > b.name!) ? 1 : -1);
       }
 
+      // Get the index of the new item
       const indexOfNewItem = this.list.indexOf(newItem);
 
       window.setTimeout(() => {
-        this.list[indexOfNewItem].div = this.divs.get(indexOfNewItem)?.nativeElement;
-        this._selectedItem.div!.innerText = this._selectedItem.div!.innerText?.trim()!;
+        this.list[indexOfNewItem].htmlItem = this.htmlItems.get(indexOfNewItem)?.nativeElement;
+        this._selectedItem.htmlItem?.focus();
+        this.list[indexOfNewItem].htmlItemName = this.htmlItemNames.get(indexOfNewItem)?.nativeElement;
+        this._selectedItem.htmlItemName!.innerText = this._selectedItem.htmlItemName!.innerText?.trim()!;
       });
 
-      this.emitItemSelected();
+      this.emitItemsSelected();
     }
   }
+
+
+
+
 
 
 
@@ -536,8 +577,72 @@ export class ListComponent {
       x.selected = false;
       x.selectType = null!;
     })
-    this.setItemFocus();
+    this.giveFocusToHtmlItemName();
   }
+
+
+
+
+
+  public deleteItems() {
+    this.emitItemsDeleted();
+    const nextSelectedItem = this.getNextSelectedItemAfterDelete();
+    this.list = this.list.filter(x => !x.selected);
+
+    if (nextSelectedItem) {
+      this.reselectItem(nextSelectedItem);
+
+    } else {
+
+      if (!this._unselectedItem) {
+        this.pivotItem = null!;
+        this._selectedItem = null!;
+        this.reinitializeList();
+      }
+    }
+  }
+
+
+
+
+  private reselectItem(item: ListItem): void {
+    this.newItem = false;
+    if (this.options.selectable) {
+      this._selectedItem = item;
+      this._selectedItem.selected = true;
+
+      window.setTimeout(() => {
+        this._selectedItem.htmlItem?.focus();
+      });
+
+      this.emitItemsSelected();
+    }
+    this._editedItem = null!;
+  }
+
+
+
+
+  private getNextSelectedItemAfterDelete(): ListItem {
+    let nextSelectedItem!: ListItem;
+
+    if (this._selectedItem) {
+      const selectedItemIndex = this.list.indexOf(this._selectedItem);
+
+      // Loop through the list of items starting with the item that follows the selected item
+      for (let i = selectedItemIndex + 1; i < this.list.length; i++) {
+        // If we come across an item that is (NOT) selected
+        if (!this.list[i].selected) {
+          // Make a copy of that item so that it can be used as the newly selected item when all the other items are deleted
+          nextSelectedItem = this.list[i];
+          break;
+        }
+      }
+    }
+    return nextSelectedItem;
+  }
+
+
 
 
 
@@ -557,19 +662,19 @@ export class ListComponent {
     return this._editedItem;
   }
 
-  public getHtmlItem(): HTMLElement {
-    return this._editedItem.div!;
+  public getHtmlItemName(): HTMLElement {
+    return this._editedItem.htmlItemName!;
   }
 
 
-  private setItemFocus(): void {
+  private giveFocusToHtmlItemName(): void {
     if (this.newItem) {
-      this.getHtmlItem().focus();
+      this.getHtmlItemName().focus();
 
     } else {
 
       const range = document.createRange();
-      range.selectNodeContents(this.getHtmlItem());
+      range.selectNodeContents(this.getHtmlItemName());
       const sel = window.getSelection();
       sel!.removeAllRanges();
       sel!.addRange(range);
@@ -578,15 +683,7 @@ export class ListComponent {
 
 
 
-  private reselectItem(): void {
-    this.newItem = false;
-    if (this.options.selectable) {
-      this._selectedItem = this._editedItem;
-      this._selectedItem.selected = true;
-      this.emitItemSelected();
-    }
-    this._editedItem = null!;
-  }
+
 
 
 
@@ -599,24 +696,24 @@ export class ListComponent {
       case CaseType.CapitalizedCase:
         // const capCase = new CapitalizedCase();
         // text = capCase.getCase(this.getHtmlItem().innerText.trim());
-        text = this.getHtmlItem().innerText.trim(); // ****** Temporary ****** \\
+        text = this.getHtmlItemName().innerText.trim(); // ****** Temporary ****** \\
         break;
 
       // Title Case
       case CaseType.TitleCase:
         // const titleCase = new TitleCase();
         // text = titleCase.getCase(this.getHtmlItem().innerText.trim());
-        text = this.getHtmlItem().innerText.trim(); // ****** Temporary ****** \\
+        text = this.getHtmlItemName().innerText.trim(); // ****** Temporary ****** \\
         break;
 
       // Lower Case
       case CaseType.LowerCase:
-        text = this.getHtmlItem().innerText.trim().toLowerCase();
+        text = this.getHtmlItemName().innerText.trim().toLowerCase();
         break;
 
       // No Case
       default:
-        text = this.getHtmlItem().innerText.trim();
+        text = this.getHtmlItemName().innerText.trim();
         break;
     }
     return text;
@@ -625,14 +722,14 @@ export class ListComponent {
 
 
   public sort(): void {
-    this.getHtmlItem().innerText = this.getEditedItem().name!.trim()!;
+    this.getHtmlItemName().innerText = this.getEditedItem().name!.trim()!;
     this.list.sort((a, b) => (a.name! > b.name!) ? 1 : -1);
   }
 
 
 
   public exitItemEdit(isEscape?: boolean, isBlur?: boolean): void {
-    const trimmedEditedItem = this.getHtmlItem().innerText.trim();
+    const trimmedEditedItem = this.getHtmlItemName().innerText.trim();
 
     // If the edited item has text written in it
     if (trimmedEditedItem.length > 0) {
@@ -653,8 +750,8 @@ export class ListComponent {
         } else {
 
           // Reset the item back to the way it was before the edit
-          this.getHtmlItem().innerText = this.getEditedItem().name!.trim()!;
-          this.reselectItem();
+          this.getHtmlItemName().innerText = this.getEditedItem().name!.trim()!;
+          this.reselectItem(this._editedItem);
         }
 
         // If we did NOT press the (Escape) key
@@ -676,7 +773,7 @@ export class ListComponent {
               this.getEditedItem().name = this.getCase();
               this.completeItemEdit();
             }
-            this.reselectItem();
+            this.reselectItem(this._editedItem);
           }
         }
       }
@@ -701,8 +798,8 @@ export class ListComponent {
         } else {
 
           // Reset the item back to the way it was before the edit
-          this.getHtmlItem().innerText = this.getEditedItem().name!.trim()!;
-          this.reselectItem();
+          this.getHtmlItemName().innerText = this.getEditedItem().name!.trim()!;
+          this.reselectItem(this._editedItem);
         }
       }
     }
@@ -724,18 +821,33 @@ export class ListComponent {
     }
 
     this.emitItemEdited();
-    this.reselectItem();
+    this.reselectItem(this._editedItem);
   }
 
 
 
-  private emitItemSelected() {
+  private emitItemsSelected() {
     const selectedItems = this.list.filter(x => x.selected == true);
-    this.itemSelectedEvent.emit(selectedItems);
+    this.selectedItemsEvent.emit(selectedItems);
   }
 
 
   private emitItemEdited() {
-    this.itemEditedEvent.emit(this.editedItem);
+    this.editedItemEvent.emit(this.editedItem);
+  }
+
+
+
+  private emitPressedDeleteKey() {
+    if (!this.editedItem && this.options.deletable) {
+      const itemsToBeDeleted = this.list.filter(x => x.selected == true);
+      this.pressedDeleteKeyEvent.emit(itemsToBeDeleted);
+    }
+  }
+
+
+  private emitItemsDeleted() {
+    const deletedItems = this.list.filter(x => x.selected == true);
+    this.deletedItemsEvent.emit(deletedItems);
   }
 }

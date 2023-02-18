@@ -22,15 +22,31 @@ export class AppComponent {
 
 
   trumpy() {
-    this.list.addItem('x','Cat');
+    // this.list.addItem();
+    this.list.addItem('x', 'Cat');
   }
 
 
-  onItemSelectedEvent(selectedItems: Array<ListItem>) {
-    // console.log(selectedItems)
+  onSelectedItems(selectedItems: Array<ListItem>) {
+    // console.log(selectedItems);
   }
 
-  onItemEditedEvent(editedItem: ListItem) {
-    // console.log(editedItem)
+  onEditedItem(editedItem: ListItem) {
+    // console.log(editedItem);
+  }
+
+  onPressedDeleteKey(itemsToBeDeleted: Array<ListItem>) {
+    // console.log(itemsToBeDeleted);
+    this.list.deleteItems();
+  }
+
+
+  onDeletedItems(deletedItems: Array<ListItem>) {
+    // console.log(deletedItems);
+  }
+
+
+  onRightClickedItem(rightClickedItem: ListItem) {
+    // console.log(rightClickedItem);
   }
 }

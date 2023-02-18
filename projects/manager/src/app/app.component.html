@@ -1,7 +1,12 @@
 <button style="margin-bottom: 20px;" (click)="trumpy()">Trumpy</button>
 
-<list #list
-      [list]="alitaList"
-      (itemEditedEvent)="onItemEditedEvent($event)"
-      (itemSelectedEvent)="onItemSelectedEvent($event)">
-</list>
+<!-- <div style="width: 300px; height: 78px;"> -->
+      <list #list
+            [list]="alitaList"
+            (editedItemEvent)="onEditedItem($event)"
+            (deletedItemsEvent)="onDeletedItems($event)"
+            (selectedItemsEvent)="onSelectedItems($event)"
+            (pressedDeleteKeyEvent)="onPressedDeleteKey($event)"
+            (rightClickedItemEvent)="onRightClickedItem($event)">
+      </list>
+<!-- </div> -->
