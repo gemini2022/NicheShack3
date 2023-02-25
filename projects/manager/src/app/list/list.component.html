@@ -10,24 +10,28 @@
           (mousedown)="onItemDown(item, $event)"
           (contextmenu)="$event.preventDefault()"
           [ngClass]="{'edited-item': item == editedItem,
-                      'selected-item': item == selectedItem,
                       'unselected-item': item == unselectedItem,
-                      'selected-item-all': item.selectType == SelectType.All,
-                      'selected-item-top': item.selectType == SelectType.Top,
-                      'selected-item-middle': item.selectType == SelectType.Middle,
-                      'selected-item-bottom': item.selectType == SelectType.Bottom,
-                      'disabled-item': (editedItem && editedItem != item) || item.disabled}">
+                      'primary-selection': item == selectedItem && item.selected,
+                      'secondary-selection-all': item.selectType == SelectType.All,
+                      'secondary-selection-top': item.selectType == SelectType.Top,
+                      'secondary-selection-middle': item.selectType == SelectType.Middle,
+                      'secondary-selection-bottom': item.selectType == SelectType.Bottom,
+                      'disabled-item': (editedItem && editedItem != item) || item.disabled,
+                      'primary-selection-border-only': item == selectedItem && !item.selected}"
+          [style]="'--r:' + (item.selectionColor ? Color.hexToRGB(item.selectionColor!).r : Color.hexToRGB(options.selectionColor!).r) + ';' + 
+                   '--g:' + (item.selectionColor ? Color.hexToRGB(item.selectionColor!).g : Color.hexToRGB(options.selectionColor!).g) + ';' +
+                   '--b:' + (item.selectionColor ? Color.hexToRGB(item.selectionColor!).b : Color.hexToRGB(options.selectionColor!).b) + ';'">
 
           <div class="indent"
-               [style.width.px]="options.indent - 2">
+               [style.width.px]="options.indent! - 2">
           </div>
      
-          <div #htmlItemName
+          <div #htmlItemText
                tabindex="-1"
-               class="item-name"
+               class="item-text"
                [contentEditable]="item == editedItem"
-               [ngClass]="{'edited-item-name': item == editedItem}">
-               {{item.name}}
+               [ngClass]="{'edited-item-text': item == editedItem}">
+               {{item.text}}
           </div>
      </div>
 </div>

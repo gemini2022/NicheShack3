@@ -14,9 +14,9 @@
     align-items: center;
     border: 1px solid transparent;
 
-    &:hover:not(.edited-item):not(.selected-item):not(.unselected-item):not(.selected-item-all):not(.selected-item-top):not(.selected-item-middle):not(.selected-item-bottom):not(.disabled-item) {
-        color: #dddddd;
-        background: rgba(255, 187, 0, 0.08);
+    &:hover:not(.edited-item):not(.unselected-item):not(.primary-selection):not(.secondary-selection-all):not(.secondary-selection-top):not(.secondary-selection-middle):not(.secondary-selection-bottom):not(.primary-selection-border):not(.disabled-item) {
+        color: lighten(#a0a0a0, 24);
+        background: rgba(var(--r), var(--g), var(--b), 0.03);
     }
 }
 
@@ -24,7 +24,7 @@
 
 .edited-item {
     outline: none;
-    color: #cccccc;
+    color: lighten(#a0a0a0, 24);
     border-right: none;
     background: #202020;
     border-color: transparent;
@@ -32,59 +32,66 @@
 
 
 
-.selected-item {
-    color: white;
-    background: rgba(255, 187, 0, 0.1);
-    border-color: rgba(255, 187, 0, 0.85);
-}
-
-
-
 .unselected-item {
-    color: #aaaaaa;
-    border-color: rgba(255, 187, 0, 0.85);
+    color: #a0a0a0;
+    border-color: rgba(var(--r), var(--g), var(--b), 0.851);
 
     &:hover {
-        color: #dddddd;
-        background: rgba(255, 187, 0, 0.03);
+        color: lighten(#a0a0a0, 20);
+        background: rgba(var(--r), var(--g), var(--b), 0.03);
     }
 }
 
 
 
-.selected-item-all {
-    color: #cfcfcf;
-    background: rgba(255, 187, 0, 0.05);
-    border-color: rgba(255, 187, 0, 0.25);
+.primary-selection {
+    color: lighten(#a0a0a0, 38);
+    background: rgba(var(--r), var(--g), var(--b), 0.1);
+    border-color: rgba(var(--r), var(--g), var(--b), 0.85);
 }
 
 
 
-.selected-item-top {
-    color: #cfcfcf;
-    background: rgba(255, 187, 0, 0.05);
-    border-top-color: rgba(255, 187, 0, 0.25);
-    border-left-color: rgba(255, 187, 0, 0.25);
-    border-right-color: rgba(255, 187, 0, 0.25);
+.secondary-selection-all:not(.primary-selection) {
+    color: lighten(#a0a0a0, 18);
+    background: rgba(var(--r), var(--g), var(--b), 0.05);
+    border-color: rgba(var(--r), var(--g), var(--b), 0.25);
 }
 
 
 
-.selected-item-middle {
-    color: #cfcfcf;
-    background: rgba(255, 187, 0, 0.05);
-    border-left-color: rgba(255, 187, 0, 0.25);
-    border-right-color: rgba(255, 187, 0, 0.25);
+.secondary-selection-top:not(.primary-selection) {
+    color: lighten(#a0a0a0, 18);
+    background: rgba(var(--r), var(--g), var(--b), 0.05);
+    border-top-color: rgba(var(--r), var(--g), var(--b), 0.25);
+    border-left-color: rgba(var(--r), var(--g), var(--b), 0.25);
+    border-right-color: rgba(var(--r), var(--g), var(--b), 0.25);
 }
 
 
 
-.selected-item-bottom {
-    color: #cfcfcf;
-    background: rgba(255, 187, 0, 0.05);
-    border-left-color: rgba(255, 187, 0, 0.25);
-    border-right-color: rgba(255, 187, 0, 0.25);
-    border-bottom-color: rgba(255, 187, 0, 0.25);
+.secondary-selection-middle:not(.primary-selection) {
+    color: lighten(#a0a0a0, 18);
+    background: rgba(var(--r), var(--g), var(--b), 0.05);
+    border-left-color: rgba(var(--r), var(--g), var(--b), 0.25);
+    border-right-color: rgba(var(--r), var(--g), var(--b), 0.25);
+}
+
+
+
+.secondary-selection-bottom:not(.primary-selection) {
+    color: lighten(#a0a0a0, 18);
+    background: rgba(var(--r), var(--g), var(--b), 0.05);
+    border-left-color: rgba(var(--r), var(--g), var(--b), 0.25);
+    border-right-color: rgba(var(--r), var(--g), var(--b), 0.25);
+    border-bottom-color: rgba(var(--r), var(--g), var(--b), 0.25);
+}
+
+
+
+.primary-selection-border-only {
+    color: lighten(#a0a0a0, 38);
+    border-color: rgba(var(--r), var(--g), var(--b), 0.85);
 }
 
 
@@ -95,7 +102,7 @@
 
 
 
-.item-name {
+.item-text {
     width: 100%;
     height: 26px;
     display: flex;
@@ -104,7 +111,7 @@
     margin-top: -1px;
     line-height: 22px;
     align-items: center;
-    border: 1px solid transparent;
+    border: 1px solid rgba(0, 0, 0, 0);
 }
 
 
@@ -115,7 +122,7 @@
 
 
 
-.edited-item-name {
+.edited-item-text {
     background: #2b2b2b;
-    border: 1px solid rgba(255, 187, 0, 0.25);
+    border-color: rgba(var(--r), var(--g), var(--b), 0.25);
 }

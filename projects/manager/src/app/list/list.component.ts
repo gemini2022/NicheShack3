@@ -1,7 +1,8 @@
+import { Color } from '../color';
 import { ListItem } from '../list-item';
 import { ListOptions } from '../list-options';
 import { CaseType, ItemSelectType } from '../enums';
-import { Component, ElementRef, EventEmitter, Input, Output, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, Output, QueryList, SimpleChanges, ViewChild, ViewChildren } from '@angular/core';
 
 @Component({
   selector: 'list',
@@ -21,6 +22,7 @@ export class ListComponent {
   private stopMouseDownPropagation!: boolean;
 
   // Public
+  public Color = Color;
   public SelectType = ItemSelectType;
   public get editedItem(): ListItem { return this._editedItem; }
   public get selectedItem(): ListItem { return this._selectedItem; }
@@ -31,22 +33,36 @@ export class ListComponent {
   @Input() public options: ListOptions = new ListOptions();
   @ViewChild('listContainer') listContainer!: ElementRef<HTMLElement>;
   @ViewChildren('htmlItem') private htmlItems!: QueryList<ElementRef<HTMLElement>>;
-  @ViewChildren('htmlItemName') private htmlItemNames!: QueryList<ElementRef<HTMLElement>>;
+  @ViewChildren('htmlItemText') private htmlItemTexts!: QueryList<ElementRef<HTMLElement>>;
 
   // Events
   @Output() public editedItemEvent: EventEmitter<ListItem> = new EventEmitter();
+  @Output() public pressedEnterKeyEvent: EventEmitter<ListItem> = new EventEmitter();
   @Output() public rightClickedItemEvent: EventEmitter<ListItem> = new EventEmitter();
   @Output() public deletedItemsEvent: EventEmitter<Array<ListItem>> = new EventEmitter();
   @Output() public selectedItemsEvent: EventEmitter<Array<ListItem>> = new EventEmitter();
   @Output() public pressedDeleteKeyEvent: EventEmitter<Array<ListItem>> = new EventEmitter();
 
 
+
+
+  
+  private ngOnChanges(changes: SimpleChanges) {
+    if (changes.options) this.options = new ListOptions(changes.options.currentValue);
+  }
+
+
+
   private ngAfterViewInit(): void {
     this.list.forEach((x, i) => {
       x.htmlItem = this.htmlItems.get(i)?.nativeElement;
-      x.htmlItemName = this.htmlItemNames.get(i)?.nativeElement;
+      x.htmlItemText = this.htmlItemTexts.get(i)?.nativeElement;
     })
   }
+
+
+
+
 
 
   private addEventListeners(): void {
@@ -123,7 +139,7 @@ export class ListComponent {
 
           // But if the array has only one element (that would mean a list was (NOT) pasted in)
         } else {
-          this.getHtmlItemName().innerText = clipboardData;
+          this.getHtmlItemText().innerText = clipboardData;
         }
       }
     }
@@ -185,6 +201,11 @@ export class ListComponent {
     if (this._editedItem) {
       // Evaluate the state of the edit and then act accordingly
       this.exitItemEdit();
+
+      // If an item is (NOT) being edited
+    } else {
+      this.setItemSelection(this._selectedItem);
+      this.pressedEnterKeyEvent.emit(this._selectedItem)
     }
   }
 
@@ -206,26 +227,73 @@ export class ListComponent {
     }
   }
 
+
+
+
+
   private onArrowDown(e: KeyboardEvent): void {
     e.preventDefault();
-    let index: number = this._selectedItem ? this.list.indexOf(this._selectedItem) : this._unselectedItem ? this.list.indexOf(this._unselectedItem) : -1;
 
+    // First, find where the selection currently resides (if an item is selected)
+    let index: number = this._selectedItem ? this.list.indexOf(this._selectedItem) : this._unselectedItem ? this.list.indexOf(this._unselectedItem) : -1;
+    // Then move its position down one
     index++;
+
+    // If the selection goes beyond the bottom of the list, send it back up to the top
     if (index > this.list.length - 1) index = 0;
-    this.setItemSelection(this.list[index]);
+
+    // If the list is set to have the items get selected on arrow key navigation
+    if (!this.options.noSelectOnArrowKey) {
+      // Select the next item in the list
+      this.setItemSelection(this.list[index]);
+
+      // But if the list is set to (NOT) have the items get selected on arrow key navigation
+    } else {
+
+      // Don't select the next item in the list but instead surround it with the primary selection border
+      this._unselectedItem = null!;
+      this._selectedItem = this.list[index];
+      this.setItemsSelectType();
+    }
+
+    // Set focus to the item so the scrollbar can follow it
     this.list[index].htmlItem?.focus();
   }
+
+
+
 
 
   private onArrowUp(e: KeyboardEvent): void {
     e.preventDefault();
-    let index: number = this._selectedItem ? this.list.indexOf(this._selectedItem) : this._unselectedItem ? this.list.indexOf(this._unselectedItem) : this.list.length;
 
+    // First, find where the selection currently resides (if an item is selected)
+    let index: number = this._selectedItem ? this.list.indexOf(this._selectedItem) : this._unselectedItem ? this.list.indexOf(this._unselectedItem) : this.list.length;
+    // Then move its position up one
     index--;
+
+    // If the selection goes beyond the top of the list, send it back down to the bottom
     if (index < 0) index = this.list.length - 1;
-    this.setItemSelection(this.list[index]);
+
+    // If the list is set to have the items get selected on arrow key navigation
+    if (!this.options.noSelectOnArrowKey) {
+      // Select the next item in the list
+      this.setItemSelection(this.list[index]);
+
+      // But if the list is set to (NOT) have the items get selected on arrow key navigation
+    } else {
+
+      // Don't select the next item in the list but instead surround it with the primary selection border
+      this._unselectedItem = null!;
+      this._selectedItem = this.list[index];
+      this.setItemsSelectType();
+    }
+
+    // Set focus to the item so the scrollbar can follow it
     this.list[index].htmlItem?.focus();
   }
+
+
 
 
   public onItemDown(item: ListItem, e?: MouseEvent): void {
@@ -278,6 +346,8 @@ export class ListComponent {
       this.addEventListeners();
       // Define what items are selected
       this.setSelectedItems();
+
+      this.emitItemsSelected();
     }
   }
 
@@ -300,9 +370,6 @@ export class ListComponent {
 
     // Now define what the selection type is for each item
     this.setItemsSelectType();
-
-
-    this.emitItemsSelected();
   }
 
 
@@ -502,7 +569,7 @@ export class ListComponent {
 
 
 
-  public addItem(id?: string, name?: string): void {
+  public addItem(id?: string, text?: string): void {
     this.addEventListeners();
 
     this.list.forEach(x => {
@@ -514,7 +581,7 @@ export class ListComponent {
     if (this.options.editable) {
 
       // Add the new item to the top of the list
-      this.list.unshift({ id: '', name: '' });
+      this.list.unshift({ id: '', text: '' });
 
       this.newItem = true;
       this._selectedItem = null!;
@@ -523,16 +590,16 @@ export class ListComponent {
 
       window.setTimeout(() => {
         this.list[0].htmlItem = this.htmlItems.get(0)?.nativeElement;
-        this.list[0].htmlItemName = this.htmlItemNames.get(0)?.nativeElement;
-        this._editedItem.htmlItemName!.innerText = this._editedItem.htmlItemName!.innerText?.trim()!;
-        this.giveFocusToHtmlItemName();
+        this.list[0].htmlItemText = this.htmlItemTexts.get(0)?.nativeElement;
+        this._editedItem.htmlItemText!.innerText = this._editedItem.htmlItemText!.innerText?.trim()!;
+        this.giveFocusToHtmlItemText();
       });
 
       // If the list is (NOT) Editable
     } else {
 
       // Add the new item to the bottom of the list
-      this.list.push({ id: id!, name: name! });
+      this.list.push({ id: id!, text: text! });
       // Define it as the new item
       const newItem = this.list[this.list.length - 1];
 
@@ -544,7 +611,7 @@ export class ListComponent {
       // As long as the list is set to be sortable
       if (this.options.sortable) {
         // Sort the list
-        this.list.sort((a, b) => (a.name! > b.name!) ? 1 : -1);
+        this.list.sort((a, b) => (a.text! > b.text!) ? 1 : -1);
       }
 
       // Get the index of the new item
@@ -553,8 +620,8 @@ export class ListComponent {
       window.setTimeout(() => {
         this.list[indexOfNewItem].htmlItem = this.htmlItems.get(indexOfNewItem)?.nativeElement;
         this._selectedItem.htmlItem?.focus();
-        this.list[indexOfNewItem].htmlItemName = this.htmlItemNames.get(indexOfNewItem)?.nativeElement;
-        this._selectedItem.htmlItemName!.innerText = this._selectedItem.htmlItemName!.innerText?.trim()!;
+        this.list[indexOfNewItem].htmlItemText = this.htmlItemTexts.get(indexOfNewItem)?.nativeElement;
+        this._selectedItem.htmlItemText!.innerText = this._selectedItem.htmlItemText!.innerText?.trim()!;
       });
 
       this.emitItemsSelected();
@@ -577,7 +644,7 @@ export class ListComponent {
       x.selected = false;
       x.selectType = null!;
     })
-    this.giveFocusToHtmlItemName();
+    this.giveFocusToHtmlItemText();
   }
 
 
@@ -662,19 +729,19 @@ export class ListComponent {
     return this._editedItem;
   }
 
-  public getHtmlItemName(): HTMLElement {
-    return this._editedItem.htmlItemName!;
+  public getHtmlItemText(): HTMLElement {
+    return this._editedItem.htmlItemText!;
   }
 
 
-  private giveFocusToHtmlItemName(): void {
+  private giveFocusToHtmlItemText(): void {
     if (this.newItem) {
-      this.getHtmlItemName().focus();
+      this.getHtmlItemText().focus();
 
     } else {
 
       const range = document.createRange();
-      range.selectNodeContents(this.getHtmlItemName());
+      range.selectNodeContents(this.getHtmlItemText());
       const sel = window.getSelection();
       sel!.removeAllRanges();
       sel!.addRange(range);
@@ -696,24 +763,24 @@ export class ListComponent {
       case CaseType.CapitalizedCase:
         // const capCase = new CapitalizedCase();
         // text = capCase.getCase(this.getHtmlItem().innerText.trim());
-        text = this.getHtmlItemName().innerText.trim(); // ****** Temporary ****** \\
+        text = this.getHtmlItemText().innerText.trim(); // ****** Temporary ****** \\
         break;
 
       // Title Case
       case CaseType.TitleCase:
         // const titleCase = new TitleCase();
         // text = titleCase.getCase(this.getHtmlItem().innerText.trim());
-        text = this.getHtmlItemName().innerText.trim(); // ****** Temporary ****** \\
+        text = this.getHtmlItemText().innerText.trim(); // ****** Temporary ****** \\
         break;
 
       // Lower Case
       case CaseType.LowerCase:
-        text = this.getHtmlItemName().innerText.trim().toLowerCase();
+        text = this.getHtmlItemText().innerText.trim().toLowerCase();
         break;
 
       // No Case
       default:
-        text = this.getHtmlItemName().innerText.trim();
+        text = this.getHtmlItemText().innerText.trim();
         break;
     }
     return text;
@@ -722,14 +789,14 @@ export class ListComponent {
 
 
   public sort(): void {
-    this.getHtmlItemName().innerText = this.getEditedItem().name!.trim()!;
-    this.list.sort((a, b) => (a.name! > b.name!) ? 1 : -1);
+    this.getHtmlItemText().innerText = this.getEditedItem().text!.trim()!;
+    this.list.sort((a, b) => (a.text! > b.text!) ? 1 : -1);
   }
 
 
 
   public exitItemEdit(isEscape?: boolean, isBlur?: boolean): void {
-    const trimmedEditedItem = this.getHtmlItemName().innerText.trim();
+    const trimmedEditedItem = this.getHtmlItemText().innerText.trim();
 
     // If the edited item has text written in it
     if (trimmedEditedItem.length > 0) {
@@ -750,7 +817,7 @@ export class ListComponent {
         } else {
 
           // Reset the item back to the way it was before the edit
-          this.getHtmlItemName().innerText = this.getEditedItem().name!.trim()!;
+          this.getHtmlItemText().innerText = this.getEditedItem().text!.trim()!;
           this.reselectItem(this._editedItem);
         }
 
@@ -761,16 +828,16 @@ export class ListComponent {
         // As long as a list was (NOT) pasted into the item
         if (!this.getEditedItem().pastedItems) {
 
-          // As long as the edited name is different from what it was before the edit
-          if (trimmedEditedItem.toLowerCase() != this.getEditedItem().name!.trim().toLowerCase()) {
+          // As long as the edited text is different from what it was before the edit
+          if (trimmedEditedItem.toLowerCase() != this.getEditedItem().text!.trim().toLowerCase()) {
             this.completeItemEdit();
 
-            // If the edited name has NOT changed
+            // If the edited text has NOT changed
           } else {
 
             //But if the case was changed. i.e. lower case to upper case
-            if (trimmedEditedItem != this.getEditedItem().name!.trim()) {
-              this.getEditedItem().name = this.getCase();
+            if (trimmedEditedItem != this.getEditedItem().text!.trim()) {
+              this.getEditedItem().text = this.getCase();
               this.completeItemEdit();
             }
             this.reselectItem(this._editedItem);
@@ -798,7 +865,7 @@ export class ListComponent {
         } else {
 
           // Reset the item back to the way it was before the edit
-          this.getHtmlItemName().innerText = this.getEditedItem().name!.trim()!;
+          this.getHtmlItemText().innerText = this.getEditedItem().text!.trim()!;
           this.reselectItem(this._editedItem);
         }
       }
@@ -809,8 +876,8 @@ export class ListComponent {
 
 
   private completeItemEdit(): void {
-    // Update the name property
-    this.getEditedItem().name = this.getCase();
+    // Update the text property
+    this.getEditedItem().text = this.getCase();
 
 
     // As long as the list is sortable

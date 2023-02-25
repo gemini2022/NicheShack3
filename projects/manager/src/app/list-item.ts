@@ -1,16 +1,17 @@
 import { CaseType, ItemSelectType } from "./enums";
 
 export class ListItem {
-    id!: string;
-    name!: string;
-    case?: CaseType;
-    selected?: boolean;
-    editable?: boolean;
-    disabled?: boolean;
-    selectable?: boolean;
-    htmlItem?: HTMLElement;
-    htmlItemName?: HTMLElement;
-    showSelection?: boolean;
-    selectType?: ItemSelectType;
-    pastedItems?: Array<string>;
+    public id!: string;
+    public text!: string;
+    public case?: CaseType;
+    public selected?: boolean;
+    public editable?: boolean;
+    public disabled?: boolean;
+    public selectable?: boolean;
+    public htmlItem?: HTMLElement;
+    public showSelection?: boolean;
+    public selectionColor?: string;
+    public htmlItemText?: HTMLElement;
+    public selectType?: ItemSelectType;
+    public pastedItems?: Array<string>;
 }

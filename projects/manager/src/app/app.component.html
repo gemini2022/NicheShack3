@@ -1,11 +1,22 @@
 <button style="margin-bottom: 20px;" (click)="trumpy()">Trumpy</button>
 
 <!-- <div style="width: 300px; height: 78px;"> -->
+
+      <!-- #1 & #2 -->
+      <!-- [options]="listOptions" -->
+
+
+      <!-- #4 -->
+      <!-- [options]="{indent: 22}" -->
+
+
       <list #list
             [list]="alitaList"
+            
             (editedItemEvent)="onEditedItem($event)"
             (deletedItemsEvent)="onDeletedItems($event)"
             (selectedItemsEvent)="onSelectedItems($event)"
+            (pressedEnterKeyEvent)="onPressedEnterKey($event)"
             (pressedDeleteKeyEvent)="onPressedDeleteKey($event)"
             (rightClickedItemEvent)="onRightClickedItem($event)">
       </list>
