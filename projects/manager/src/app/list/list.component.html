@@ -18,9 +18,15 @@
                       'secondary-selection-bottom': item.selectType == SelectType.Bottom,
                       'disabled-item': (editedItem && editedItem != item) || item.disabled,
                       'primary-selection-border-only': item == selectedItem && !item.selected}"
-          [style]="'--r:' + (item.selectionColor ? Color.hexToRGB(item.selectionColor!).r : Color.hexToRGB(options.selectionColor!).r) + ';' + 
-                   '--g:' + (item.selectionColor ? Color.hexToRGB(item.selectionColor!).g : Color.hexToRGB(options.selectionColor!).g) + ';' +
-                   '--b:' + (item.selectionColor ? Color.hexToRGB(item.selectionColor!).b : Color.hexToRGB(options.selectionColor!).b) + ';'">
+          [style]="'--textColorR:' + (item.textColor ? Color.hexToRGB(item.textColor!).r : Color.hexToRGB(options.textColor!).r) + ';' + 
+                   '--textColorG:' + (item.textColor ? Color.hexToRGB(item.textColor!).g : Color.hexToRGB(options.textColor!).g) + ';' +
+                   '--textColorB:' + (item.textColor ? Color.hexToRGB(item.textColor!).b : Color.hexToRGB(options.textColor!).b) + ';' +
+                   '--hoverColorR:' + (item.hoverColor ? Color.hexToRGB(item.hoverColor!).r : Color.hexToRGB(options.hoverColor!).r) + ';' + 
+                   '--hoverColorG:' + (item.hoverColor ? Color.hexToRGB(item.hoverColor!).g : Color.hexToRGB(options.hoverColor!).g) + ';' +
+                   '--hoverColorB:' + (item.hoverColor ? Color.hexToRGB(item.hoverColor!).b : Color.hexToRGB(options.hoverColor!).b) + ';' +
+                   '--selectionColorR:' + (item.selectionColor ? Color.hexToRGB(item.selectionColor!).r : Color.hexToRGB(options.selectionColor!).r) + ';' + 
+                   '--selectionColorG:' + (item.selectionColor ? Color.hexToRGB(item.selectionColor!).g : Color.hexToRGB(options.selectionColor!).g) + ';' +
+                   '--selectionColorB:' + (item.selectionColor ? Color.hexToRGB(item.selectionColor!).b : Color.hexToRGB(options.selectionColor!).b) + ';'">
 
           <div class="indent"
                [style.width.px]="options.indent! - 2">

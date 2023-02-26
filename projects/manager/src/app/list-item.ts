@@ -7,6 +7,8 @@ export class ListItem {
     public selected?: boolean;
     public editable?: boolean;
     public disabled?: boolean;
+    public textColor?: string;
+    public hoverColor?: string;
     public selectable?: boolean;
     public htmlItem?: HTMLElement;
     public showSelection?: boolean;

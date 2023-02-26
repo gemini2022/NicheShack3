@@ -8,9 +8,12 @@ export class ListOptions {
     public unselectable?: boolean = true;
     public loopSelection?: boolean = true;
     public showSelection?: boolean = true;
+    public textColor?: string = '#a0a0a0';
+    public hoverColor?: string = '#ffba00';
     public multiselectable?: boolean = true;
     public selectionColor?: string = '#ffba00';
     public noSelectOnArrowKey?: boolean = true;
+    
 
     constructor(listOptions?: ListOptions) {
         this.indent = listOptions && listOptions.indent ? listOptions.indent : this.indent;
