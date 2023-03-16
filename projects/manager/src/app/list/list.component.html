@@ -1,14 +1,16 @@
 <div #listContainer
      class="list-container"
-     (mousedown)="onListMouseDown($event)">
+     (scroll)="onScroll(listContainer)"
+     (mousedown)="onListContainerMouseDown($event, listContainer)">
 
      <div *ngFor="let item of list"
           #htmlItem
           class="item"
           tabindex="-1"
           (dblclick)="onItemDoubleClick()"
-          (mousedown)="onItemDown(item, $event)"
-          (contextmenu)="$event.preventDefault()"
+          [style.height.px]="options.itemHeight"
+          (mousedown)="onItemSelect(item, $event)"
+          (contextmenu)="$event.preventDefault();"
           [ngClass]="{'edited-item': item == editedItem,
                       'unselected-item': item == unselectedItem,
                       'primary-selection': item == selectedItem && item.selected,
@@ -26,7 +28,8 @@
                    '--hoverColorB:' + (item.hoverColor ? Color.hexToRGB(item.hoverColor!).b : Color.hexToRGB(options.hoverColor!).b) + ';' +
                    '--selectionColorR:' + (item.selectionColor ? Color.hexToRGB(item.selectionColor!).r : Color.hexToRGB(options.selectionColor!).r) + ';' + 
                    '--selectionColorG:' + (item.selectionColor ? Color.hexToRGB(item.selectionColor!).g : Color.hexToRGB(options.selectionColor!).g) + ';' +
-                   '--selectionColorB:' + (item.selectionColor ? Color.hexToRGB(item.selectionColor!).b : Color.hexToRGB(options.selectionColor!).b) + ';'">
+                   '--selectionColorB:' + (item.selectionColor ? Color.hexToRGB(item.selectionColor!).b : Color.hexToRGB(options.selectionColor!).b) + ';'"
+          [ngStyle]="{'cursor': item.cursor ? item.cursor : options.cursor}">
 
           <div class="indent"
                [style.width.px]="options.indent! - 2">
@@ -35,8 +38,20 @@
           <div #htmlItemText
                tabindex="-1"
                class="item-text"
+               (mouseup)="getHtmlItemTextSelection()"
+               (mousedown)="getHtmlItemTextSelection()"
+               (keydown.space)="getHtmlItemTextSelection()"
+               (keydown.arrowup)="getHtmlItemTextSelection()"
+               (keydown.arrowdown)="getHtmlItemTextSelection()"
+               (keydown.backspace)="getHtmlItemTextSelection()"
+               (keydown.arrowleft)="getHtmlItemTextSelection()"
+               (keydown.arrowleft)="getHtmlItemTextSelection()"
+               (keydown.arrowRight)="getHtmlItemTextSelection()"
                [contentEditable]="item == editedItem"
-               [ngClass]="{'edited-item-text': item == editedItem}">
+               [style.lineHeight.px]="options.itemHeight! - 2"
+               [ngClass]="{'edited-item-text': item == editedItem}"
+               [style.fontSize.px]="item.fontSize ? item.fontSize : options.fontSize"
+               [style.fontFamily]="item.fontFamily ? item.fontFamily : options.fontFamily">
                {{item.text}}
           </div>
      </div>

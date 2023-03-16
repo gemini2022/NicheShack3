@@ -1,12 +1,12 @@
 .list-container {
     height: 100%;
     overflow-y: auto;
+    position: relative;
 }
 
 
 
 .item {
-    height: 26px;
     display: flex;
     outline: none;
     user-select: none;
@@ -16,7 +16,7 @@
 
     &:hover:not(.edited-item):not(.unselected-item):not(.primary-selection):not(.secondary-selection-all):not(.secondary-selection-top):not(.secondary-selection-middle):not(.secondary-selection-bottom):not(.primary-selection-border):not(.disabled-item) {
         background: rgba(var(--hoverColorR), var(--hoverColorG), var(--hoverColorB), 0.03);
-        color: rgb(calc(var(--textColorR) + 61), calc(var(--textColorG) + 61), calc(var(--textColorB) + 61));
+        color: rgb(calc(var(--textColorR) + 50), calc(var(--textColorG) + 50), calc(var(--textColorB) + 50));
     }
 }
 
@@ -104,13 +104,11 @@
 
 .item-text {
     width: 100%;
-    height: 26px;
-    display: flex;
     outline: none;
     background: none;
     margin-top: -1px;
-    line-height: 22px;
-    align-items: center;
+    overflow: hidden;
+    white-space: nowrap;
     border: 1px solid rgba(0, 0, 0, 0);
 }
 

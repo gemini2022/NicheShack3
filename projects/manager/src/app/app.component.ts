@@ -1,7 +1,8 @@
 import { Component, ViewChild } from '@angular/core';
+import { CaseType } from './enums';
 import { ListItem } from './list-item';
-import { ListOptions } from './list-options';
 import { ListComponent } from './list/list.component';
+import { PageLoad } from './page-load';
 
 @Component({
   selector: 'app-root',
@@ -10,60 +11,48 @@ import { ListComponent } from './list/list.component';
 })
 export class AppComponent {
   @ViewChild('list') list!: ListComponent;
-
-  public alitaList: Array<ListItem> = [
-    { id: 'a', text: 'Alita' },
-    { id: 'b', text: 'Battle' },
-    { id: 'c', text: 'Angel' },
-    { id: 'd', text: 'Make' },
-    { id: 'e', text: 'America' },
-    { id: 'f', text: 'Great' },
-    { id: 'g', text: 'Again' }
-  ];
+  public testList: Array<ListItem> = new Array<ListItem>();
+  private listLength!: number;
 
 
 
 
+  onRequestedPageLoad(pageLoad: PageLoad) {
+    this.listLength = this.testList.length;
+    // window.setTimeout(() => {
+    for (let i = this.listLength; i < this.listLength + pageLoad.itemsPerPage; i++) {
+      this.testList.push({ id: i.toString(), text: 'item' + (i + 1) })
+    }
 
-  // #1
-  // public listOptions: ListOptions = new ListOptions({
-  //   indent: 22
-  // });
-
-
-
-
-
-  // #2
-  // public listOptions: ListOptions = new ListOptions();
-
-  // ngOnInit() {
-  //   this.listOptions.indent = 22;
-  // }
+    // }, 1000)
+  }
 
 
 
 
-  // #3
-  // ngAfterViewInit() {
-  //   window.setTimeout(()=> {
-  //     this.list.options.indent = 22;
-  //   })
-  // }
-
-
-
-
-
-
-  trumpy() {
-    // this.list.addItem();
+  addItem() {
+    this.list.addItem();
     // this.list.addItem('x', 'Cat');
+  }
+
+
+  editItem() {
+    this.list.editItem();
+  }
+
+
+  deleteItem() {
+    this.list.deleteItem();
   }
 
 
   onSelectedItems(selectedItems: Array<ListItem>) {
     // console.log(selectedItems);
+  }
+
+
+  onAddedItem(addedItem: ListItem) {
+    // console.log(addedItem);
   }
 
   onEditedItem(editedItem: ListItem) {
@@ -72,12 +61,12 @@ export class AppComponent {
 
   onPressedDeleteKey(itemsToBeDeleted: Array<ListItem>) {
     // console.log(itemsToBeDeleted);
-    this.list.deleteItems();
+    this.list.deleteItem();
   }
 
 
   onPressedEnterKey(selectedItem: ListItem) {
-    console.log(selectedItem);
+    // console.log(selectedItem);
   }
 
 
@@ -88,5 +77,21 @@ export class AppComponent {
 
   onRightClickedItem(rightClickedItem: ListItem) {
     // console.log(rightClickedItem);
+  }
+
+
+  onRequestedItemCaseType(item: ListItem) {
+
+    
+
+    // window.setTimeout(()=> {
+    //   console.log('hello')
+    item.caseType = CaseType.TitleCase;
+    // },4500)
+  }
+
+
+  onPastedItems(pastedItems: Array<ListItem>){
+    console.log(pastedItems)
   }
 }

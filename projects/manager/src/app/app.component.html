@@ -1,23 +1,23 @@
-<button style="margin-bottom: 20px;" (click)="trumpy()">Trumpy</button>
-
-<!-- <div style="width: 300px; height: 78px;"> -->
-
-      <!-- #1 & #2 -->
-      <!-- [options]="listOptions" -->
-
-
-      <!-- #4 -->
-      <!-- [options]="{indent: 22}" -->
+<div style="display: flex; margin: 15px 0 30px 5px;">
+      <button style="margin-right: 20px;" (click)="addItem()">Add Item</button>
+      <button style="margin-right: 20px;" (click)="editItem()" (mousedown)="$event.stopPropagation()">Edit Item</button>
+      <button (click)="deleteItem()" (mousedown)="$event.stopPropagation()">Delete Item</button>
+</div>
 
 
+
+<div style="width: 300px; height: 260px; background: rgb(51, 51, 51);">
       <list #list
-            [list]="alitaList"
-            
+            [list]="testList"
+            (addedItemEvent)="onAddedItem($event)"
             (editedItemEvent)="onEditedItem($event)"
+            (pastedItemsEvent)="onPastedItems($event)"
             (deletedItemsEvent)="onDeletedItems($event)"
             (selectedItemsEvent)="onSelectedItems($event)"
             (pressedEnterKeyEvent)="onPressedEnterKey($event)"
             (pressedDeleteKeyEvent)="onPressedDeleteKey($event)"
-            (rightClickedItemEvent)="onRightClickedItem($event)">
+            (rightClickedItemEvent)="onRightClickedItem($event)"
+            (requestedPageLoadEvent)="onRequestedPageLoad($event)"
+            (requestedItemCaseTypeEvent)="onRequestedItemCaseType($event)">
       </list>
-<!-- </div> -->
+</div>

@@ -1,5 +1,6 @@
 import { Color } from '../color';
 import { ListItem } from '../list-item';
+import { PageLoad } from '../page-load';
 import { ListOptions } from '../list-options';
 import { CaseType, ItemSelectType } from '../enums';
 import { Component, ElementRef, EventEmitter, Input, Output, QueryList, SimpleChanges, ViewChild, ViewChildren } from '@angular/core';
@@ -11,7 +12,8 @@ import { Component, ElementRef, EventEmitter, Input, Output, QueryList, SimpleCh
 })
 export class ListComponent {
   // Private
-  private newItem!: boolean;
+  private newScrollTop = 0;
+  private isNewItem!: boolean;
   private pivotItem!: ListItem;
   private ctrlKeyDown!: boolean;
   private shiftKeyDown!: boolean;
@@ -19,6 +21,8 @@ export class ListComponent {
   private _selectedItem!: ListItem;
   private _unselectedItem!: ListItem;
   private eventListenersAdded!: boolean;
+  private loadedPages: Array<number> = [0];
+  private htmlItemTextSelection!: Selection;
   private stopMouseDownPropagation!: boolean;
 
   // Public
@@ -31,272 +35,45 @@ export class ListComponent {
   // Decorators
   @Input() public list!: Array<ListItem>;
   @Input() public options: ListOptions = new ListOptions();
-  @ViewChild('listContainer') listContainer!: ElementRef<HTMLElement>;
   @ViewChildren('htmlItem') private htmlItems!: QueryList<ElementRef<HTMLElement>>;
   @ViewChildren('htmlItemText') private htmlItemTexts!: QueryList<ElementRef<HTMLElement>>;
 
   // Events
+  @Output() public addedItemEvent: EventEmitter<ListItem> = new EventEmitter();
   @Output() public editedItemEvent: EventEmitter<ListItem> = new EventEmitter();
   @Output() public pressedEnterKeyEvent: EventEmitter<ListItem> = new EventEmitter();
+  @Output() public requestedPageLoadEvent: EventEmitter<PageLoad> = new EventEmitter();
   @Output() public rightClickedItemEvent: EventEmitter<ListItem> = new EventEmitter();
+  @Output() public pastedItemsEvent: EventEmitter<Array<ListItem>> = new EventEmitter();
   @Output() public deletedItemsEvent: EventEmitter<Array<ListItem>> = new EventEmitter();
   @Output() public selectedItemsEvent: EventEmitter<Array<ListItem>> = new EventEmitter();
+  @Output() public requestedItemCaseTypeEvent: EventEmitter<ListItem> = new EventEmitter();
   @Output() public pressedDeleteKeyEvent: EventEmitter<Array<ListItem>> = new EventEmitter();
 
 
 
 
-  
+
   private ngOnChanges(changes: SimpleChanges) {
     if (changes.options) this.options = new ListOptions(changes.options.currentValue);
   }
 
 
 
-  private ngAfterViewInit(): void {
-    this.list.forEach((x, i) => {
-      x.htmlItem = this.htmlItems.get(i)?.nativeElement;
-      x.htmlItemText = this.htmlItemTexts.get(i)?.nativeElement;
-    })
+  private ngOnInit() {
+    if (this.options.loadListOnInit) this.LoadPage(1);
+  }
+
+
+  public LoadPage(pageNumber: number) {
+    this.loadedPages[pageNumber] = pageNumber;
+    this.requestedPageLoadEvent.emit(new PageLoad(pageNumber, this.options.itemsPerPage!));
   }
 
 
 
 
-
-
-  private addEventListeners(): void {
-    if (!this.eventListenersAdded) {
-      this.eventListenersAdded = true;
-      window.addEventListener('keyup', this.onKeyUp);
-      window.addEventListener('paste', this.onPaste);
-      window.addEventListener('keydown', this.onKeyDown);
-      window.addEventListener('mousedown', this.onMouseDown);
-    }
-  }
-
-
-
-  private reinitializeList(): void {
-    if (this.options.unselectable) {
-      this.pivotItem = null!;
-      this._editedItem = null!;
-      this.ctrlKeyDown = false;
-      this._selectedItem = null!;
-      this.shiftKeyDown = false;
-      this._unselectedItem = null!;
-      this.eventListenersAdded = false;
-      this.list.forEach(x => {
-        x.selected = false;
-        x.selectType = null!;
-      });
-      window.removeEventListener('keyup', this.onKeyUp);
-      window.removeEventListener('paste', this.onPaste);
-      window.removeEventListener('keydown', this.onKeyDown);
-      window.removeEventListener('mousedown', this.onMouseDown);
-    }
-  }
-
-
-
-  private onKeyUp = (e: KeyboardEvent): void => {
-    if (this.options.multiselectable) {
-      if (e.key === 'Control') this.ctrlKeyDown = false;
-      if (e.key === 'Shift') this.shiftKeyDown = false;
-    }
-  }
-
-
-
-  private onPaste = (e: Event): void => {
-    if (this.getEditedItem()) {
-      e.preventDefault();
-
-      // Record the clipboard data
-      const clipboardData = (e as ClipboardEvent).clipboardData!.getData('text/plain').trim();
-
-      // As long as there is clipboard data (and not an empty string)
-      if (clipboardData) {
-        // Convert the clipboard data into an array anywhere there is a newline detected (if any)
-        const clipboardDataArray = clipboardData.split("\n");
-
-        // Remove \r anywhere it is found (if any)
-        clipboardDataArray.forEach((x, i, arry) => {
-          arry[i] = x.replace('\r', '').toLowerCase();
-        })
-
-        // If the array has more than one element (that would mean a list was pasted in)
-        if (clipboardDataArray.length > 1) {
-          // Remove the duplicate items (if any)
-          let uniqueClipboardDataArray = [...new Set(clipboardDataArray)];
-
-          // And as long as the list was pasted into a new item (not an existing item that is being edited)
-          if (this.newItem) {
-            this.newItem = false;
-            this.getEditedItem().pastedItems = uniqueClipboardDataArray;
-            // this.multiItemAddUpdate(this.getEditedItem());
-          }
-
-          // But if the array has only one element (that would mean a list was (NOT) pasted in)
-        } else {
-          this.getHtmlItemText().innerText = clipboardData;
-        }
-      }
-    }
-  }
-
-
-
-  private onKeyDown = (e: KeyboardEvent): void => {
-    if (e.key === 'Enter') this.onEnter(e);
-    if (e.key === 'Escape') this.onEscape();
-    if (e.key === 'ArrowUp') this.onArrowUp(e);
-    if (e.key === 'ArrowDown') this.onArrowDown(e);
-    if (e.key === 'Delete') this.emitPressedDeleteKey();
-
-    if (this.options.multiselectable) {
-      if (e.key === 'Shift') this.shiftKeyDown = true;
-      if (e.key === 'Control') this.ctrlKeyDown = true;
-    }
-  }
-
-
-
-  private onMouseDown = (): void => {
-    // As long as a mouse-down on an item did (NOT) just occur
-    if (!this.stopMouseDownPropagation) {
-
-      // If an item is being edited or added
-      if (this._editedItem) {
-
-        // Evaluate the state of the edit and then act accordingly
-        this.exitItemEdit(null!, true);
-
-        // If an item is (NOT) being edited
-      } else {
-
-        // Then reinitialize the list
-        this.reinitializeList();
-      }
-
-      // If a mouse-down on an item did just occur
-    } else {
-      this.stopMouseDownPropagation = false;
-    }
-  }
-
-
-
-  onListMouseDown(e: MouseEvent) {
-    if (e.clientX > this.listContainer.nativeElement.clientWidth) {
-      this.stopMouseDownPropagation = true;
-    }
-  }
-
-
-  private onEnter(e: KeyboardEvent): void {
-    e.preventDefault();
-
-    // If an item is being edited
-    if (this._editedItem) {
-      // Evaluate the state of the edit and then act accordingly
-      this.exitItemEdit();
-
-      // If an item is (NOT) being edited
-    } else {
-      this.setItemSelection(this._selectedItem);
-      this.pressedEnterKeyEvent.emit(this._selectedItem)
-    }
-  }
-
-
-
-
-  private onEscape(): void {
-    // If an item is being edited
-    if (this._editedItem) {
-
-      // Evaluate the state of the edit and then act accordingly
-      this.exitItemEdit(true);
-
-      // If an item is NOT being edited
-    } else {
-
-      // Then reinitialize the list
-      this.reinitializeList();
-    }
-  }
-
-
-
-
-
-  private onArrowDown(e: KeyboardEvent): void {
-    e.preventDefault();
-
-    // First, find where the selection currently resides (if an item is selected)
-    let index: number = this._selectedItem ? this.list.indexOf(this._selectedItem) : this._unselectedItem ? this.list.indexOf(this._unselectedItem) : -1;
-    // Then move its position down one
-    index++;
-
-    // If the selection goes beyond the bottom of the list, send it back up to the top
-    if (index > this.list.length - 1) index = 0;
-
-    // If the list is set to have the items get selected on arrow key navigation
-    if (!this.options.noSelectOnArrowKey) {
-      // Select the next item in the list
-      this.setItemSelection(this.list[index]);
-
-      // But if the list is set to (NOT) have the items get selected on arrow key navigation
-    } else {
-
-      // Don't select the next item in the list but instead surround it with the primary selection border
-      this._unselectedItem = null!;
-      this._selectedItem = this.list[index];
-      this.setItemsSelectType();
-    }
-
-    // Set focus to the item so the scrollbar can follow it
-    this.list[index].htmlItem?.focus();
-  }
-
-
-
-
-
-  private onArrowUp(e: KeyboardEvent): void {
-    e.preventDefault();
-
-    // First, find where the selection currently resides (if an item is selected)
-    let index: number = this._selectedItem ? this.list.indexOf(this._selectedItem) : this._unselectedItem ? this.list.indexOf(this._unselectedItem) : this.list.length;
-    // Then move its position up one
-    index--;
-
-    // If the selection goes beyond the top of the list, send it back down to the bottom
-    if (index < 0) index = this.list.length - 1;
-
-    // If the list is set to have the items get selected on arrow key navigation
-    if (!this.options.noSelectOnArrowKey) {
-      // Select the next item in the list
-      this.setItemSelection(this.list[index]);
-
-      // But if the list is set to (NOT) have the items get selected on arrow key navigation
-    } else {
-
-      // Don't select the next item in the list but instead surround it with the primary selection border
-      this._unselectedItem = null!;
-      this._selectedItem = this.list[index];
-      this.setItemsSelectType();
-    }
-
-    // Set focus to the item so the scrollbar can follow it
-    this.list[index].htmlItem?.focus();
-  }
-
-
-
-
-  public onItemDown(item: ListItem, e?: MouseEvent): void {
+  public onItemSelect(item: ListItem, e?: MouseEvent): void {
     this.stopMouseDownPropagation = true;
 
     // As long as the item that just received this mouse down is (NOT) currently being edited
@@ -336,19 +113,25 @@ export class ListComponent {
 
 
 
+
   private setItemSelection(item: ListItem): void {
-    // As long as the item is (NOT) being edited
-    if (!this._editedItem) {
-      this._selectedItem = item;
-      this._unselectedItem = null!;
+    this._selectedItem = item;
+    this._unselectedItem = null!;
 
-      // Add the event listeners (if not already)
-      this.addEventListeners();
-      // Define what items are selected
-      this.setSelectedItems();
+    // Add the event listeners (if not already)
+    this.addEventListeners();
+    // Define what items are selected
+    this.setSelectedItems();
 
-      this.emitItemsSelected();
-    }
+    this.emitItemsSelected();
+  }
+
+
+
+
+  private emitItemsSelected() {
+    const selectedItems = this.list.filter(x => x.selected == true);
+    this.selectedItemsEvent.emit(selectedItems);
   }
 
 
@@ -369,7 +152,7 @@ export class ListComponent {
     }
 
     // Now define what the selection type is for each item
-    this.setItemsSelectType();
+    this.setSecondarySelectionType();
   }
 
 
@@ -448,13 +231,16 @@ export class ListComponent {
 
 
 
-  private setItemsSelectType(): void {
+
+
+
+  private setSecondarySelectionType(): void {
     // As long as there is more than one item in the list
     if (this.list.length != 1) {
 
 
-      // If the first item in the list (IS) marked as selected
-      // But does (NOT) have the primary selection
+      // If the first item in the list (HAS) a secondary selection
+      // And does (NOT) have the primary selection
       if (this.list[0].selected && this.list[0] != this._selectedItem) {
 
 
@@ -475,8 +261,10 @@ export class ListComponent {
 
       // Every item in between
       for (let i = 1; i < this.list.length - 1; i++) {
-        // If the item in the list (IS) marked as selected
-        // But does (NOT) have the primary selection
+
+
+        // If the current item in the list (HAS) a secondary selection
+        // And does (NOT) have the primary selection
         if (this.list[i].selected && this.list[i] != this._selectedItem) {
 
 
@@ -488,10 +276,12 @@ export class ListComponent {
             // Item before (IS) unselected
             if (this.list[i - 1] == this._unselectedItem) {
               this.list[i].selectType = ItemSelectType.Middle;
+              continue;
 
               // Item before (NOT) unselected
             } else {
               this.list[i].selectType = ItemSelectType.Top;
+              continue;
             }
           }
 
@@ -504,10 +294,12 @@ export class ListComponent {
             // Item after (IS) unselected
             if (this.list[i + 1] == this._unselectedItem) {
               this.list[i].selectType = ItemSelectType.Middle;
+              continue;
 
               // Item after (NOT) unselected
             } else {
               this.list[i].selectType = ItemSelectType.Bottom;
+              continue;
             }
           }
 
@@ -520,14 +312,17 @@ export class ListComponent {
             // Item before (IS) unselected
             if (this.list[i - 1] == this._unselectedItem) {
               this.list[i].selectType = ItemSelectType.Bottom;
+              continue;
 
               // Item after (IS) unselected
             } else if (this.list[i + 1] == this._unselectedItem) {
               this.list[i].selectType = ItemSelectType.Top;
+              continue;
 
               // Item before and item after (NOT) unselected
             } else {
               this.list[i].selectType = ItemSelectType.All;
+              continue;
             }
           }
 
@@ -545,8 +340,8 @@ export class ListComponent {
 
 
 
-      // If the last item in the list (IS) marked as selected
-      // But does (NOT) have the primary selection
+      // If the last item in the list (HAS) a secondary selection
+      // And does (NOT) have the primary selection
       if (this.list[this.list.length - 1].selected && this.list[this.list.length - 1] != this._selectedItem) {
 
 
@@ -567,6 +362,229 @@ export class ListComponent {
 
 
 
+  private addEventListeners(): void {
+    if (!this.eventListenersAdded) {
+      this.eventListenersAdded = true;
+      window.addEventListener('keyup', this.onKeyUp);
+      window.addEventListener('paste', this.onPaste);
+      window.addEventListener('keydown', this.onKeyDown);
+      window.addEventListener('mousedown', this.onMouseDown);
+    }
+  }
+
+
+  private onMouseDown = (): void => {
+    // As long as a mouse down on an item did (NOT) just occur
+    if (!this.stopMouseDownPropagation) {
+
+      // If an item is being edited or added
+      if (this._editedItem) {
+
+        // Evaluate the state of the edit and then act accordingly
+        this.exitItemEdit(null!, true);
+
+        // If an item is (NOT) being edited
+      } else {
+
+        // Then reinitialize the list
+        this.reinitializeList();
+      }
+
+      // If a mouse-down on an item did just occur
+    } else {
+      this.stopMouseDownPropagation = false;
+    }
+  }
+
+
+
+
+  public onListContainerMouseDown(e: MouseEvent, listContainer: HTMLElement) {
+    if (e.clientX > listContainer.clientWidth) {
+      this.stopMouseDownPropagation = true;
+    }
+  }
+
+
+
+
+  private onKeyDown = (e: KeyboardEvent): void => {
+    if (e.key === 'Enter') {
+      this.onEnter(e);
+      return
+    }
+    if (e.key === 'Escape') {
+      this.onEscape();
+      return
+    }
+    if (e.key === 'ArrowUp') {
+      this.onArrowUp(e);
+      return
+    }
+    if (e.key === 'ArrowDown') {
+      this.onArrowDown(e);
+      return
+    }
+    if (e.key === 'Delete') {
+      this.emitPressedDeleteKey();
+      return
+    }
+
+    if (this.options.multiselectable) {
+      if (e.key === 'Shift') {
+        this.shiftKeyDown = true;
+        return
+      }
+      if (e.key === 'Control') {
+        this.ctrlKeyDown = true;
+        return
+      }
+    }
+  }
+
+
+
+
+  private onKeyUp = (e: KeyboardEvent): void => {
+    if (this.options.multiselectable) {
+      if (e.key === 'Control') {
+        this.ctrlKeyDown = false;
+        return
+      }
+      if (e.key === 'Shift') {
+        this.shiftKeyDown = false;
+        return
+      }
+    }
+  }
+
+
+
+  private onEnter(e: KeyboardEvent): void {
+    e.preventDefault();
+
+    if (this._editedItem) {
+      this.exitItemEdit();
+
+    } else {
+      this.setItemSelection(this._selectedItem);
+      this.pressedEnterKeyEvent.emit(this._selectedItem)
+    }
+  }
+
+
+
+
+
+  private onEscape(): void {
+    if (this._editedItem) {
+      this.exitItemEdit(true);
+
+    } else {
+      this.reinitializeList();
+    }
+  }
+
+
+
+
+  private onArrowDown(e: KeyboardEvent): void {
+    // As long as an item is (NOT) being edited
+    if (!this._editedItem) {
+      e.preventDefault();
+
+      // First, find where the selection currently resides (if an item is selected)
+      let index: number = this._selectedItem ? this.list.indexOf(this._selectedItem) : this._unselectedItem ? this.list.indexOf(this._unselectedItem) : -1;
+      // Then move its position down one
+      index++;
+
+
+      // If the selection goes beyond the bottom of the list
+      if (index > this.list.length - 1) {
+
+        // If loop selection is enabled
+        if (this.options.loopSelection) {
+          // Send it back up to the top
+          index = 0;
+
+          // If loop selection is (NOT) enabled
+        } else {
+          // Keep it at the bottom
+          index = this.list.length - 1;
+        }
+      }
+
+
+      // If the list is set to have the items get selected on arrow key navigation
+      if (!this.options.noSelectOnArrowKey) {
+        // Select the next item in the list
+        this.setItemSelection(this.list[index]);
+
+        // But if the list is set to (NOT) have the items get selected on arrow key navigation
+      } else {
+
+        // Don't select the next item in the list but instead surround it with the primary selection border
+        this._unselectedItem = null!;
+        this._selectedItem = this.list[index];
+        this.setSecondarySelectionType();
+      }
+
+      // Set focus to the item so the scrollbar can follow it
+      this.getHtmlItem(this.list[index])!.focus();
+    }
+  }
+
+
+
+
+
+  private onArrowUp(e: KeyboardEvent): void {
+    // As long as an item is (NOT) being edited
+    if (!this._editedItem) {
+      e.preventDefault();
+
+      // First, find where the selection currently resides (if an item is selected)
+      let index: number = this._selectedItem ? this.list.indexOf(this._selectedItem) : this._unselectedItem ? this.list.indexOf(this._unselectedItem) : this.list.length;
+      // Then move its position up one
+      index--;
+
+
+      // If the selection goes beyond the top of the list
+      if (index < 0) {
+
+        // If loop selection is enabled
+        if (this.options.loopSelection) {
+          // Send it back down to the bottom
+          index = this.list.length - 1;
+
+          // If loop selection is (NOT) enabled
+        } else {
+          // Keep it at the top
+          index = 0;
+        }
+      }
+
+
+      // If the list is set to have the items get selected on arrow key navigation
+      if (!this.options.noSelectOnArrowKey) {
+        // Select the next item in the list
+        this.setItemSelection(this.list[index]);
+
+        // But if the list is set to (NOT) have the items get selected on arrow key navigation
+      } else {
+
+        // Don't select the next item in the list but instead surround it with the primary selection border
+        this._unselectedItem = null!;
+        this._selectedItem = this.list[index];
+        this.setSecondarySelectionType();
+      }
+
+      // Set focus to the item so the scrollbar can follow it
+      this.getHtmlItem(this.list[index])!.focus();
+    }
+  }
+
+
 
 
   public addItem(id?: string, text?: string): void {
@@ -576,6 +594,7 @@ export class ListComponent {
       x.selected = false;
       x.selectType = null!;
     })
+    this._unselectedItem = null!;
 
     // If the list (IS) editable
     if (this.options.editable) {
@@ -583,16 +602,13 @@ export class ListComponent {
       // Add the new item to the top of the list
       this.list.unshift({ id: '', text: '' });
 
-      this.newItem = true;
+      this.isNewItem = true;
       this._selectedItem = null!;
-      this._unselectedItem = null!;
       this._editedItem = this.list[0];
 
+      // Wait a frame to allow the html item to be rendered
       window.setTimeout(() => {
-        this.list[0].htmlItem = this.htmlItems.get(0)?.nativeElement;
-        this.list[0].htmlItemText = this.htmlItemTexts.get(0)?.nativeElement;
-        this._editedItem.htmlItemText!.innerText = this._editedItem.htmlItemText!.innerText?.trim()!;
-        this.giveFocusToHtmlItemText();
+        this.getHtmlItemText(this._editedItem).focus();
       });
 
       // If the list is (NOT) Editable
@@ -606,53 +622,229 @@ export class ListComponent {
       newItem.selected = true;
       this._editedItem = null!;
       this._selectedItem = newItem;
-      this._unselectedItem = null!;
 
       // As long as the list is set to be sortable
       if (this.options.sortable) {
         // Sort the list
-        this.list.sort((a, b) => (a.text! > b.text!) ? 1 : -1);
+        this.sort();
       }
-
-      // Get the index of the new item
-      const indexOfNewItem = this.list.indexOf(newItem);
-
-      window.setTimeout(() => {
-        this.list[indexOfNewItem].htmlItem = this.htmlItems.get(indexOfNewItem)?.nativeElement;
-        this._selectedItem.htmlItem?.focus();
-        this.list[indexOfNewItem].htmlItemText = this.htmlItemTexts.get(indexOfNewItem)?.nativeElement;
-        this._selectedItem.htmlItemText!.innerText = this._selectedItem.htmlItemText!.innerText?.trim()!;
-      });
-
+      this.getHtmlItem(this._selectedItem)!.focus();
+      this.getHtmlItemText(this._selectedItem).innerText = this.getHtmlItemText(this._selectedItem).innerText.trim();
       this.emitItemsSelected();
     }
   }
 
 
 
+  public onItemDoubleClick(): void {
+    // As long as an item is (NOT) being edited and the [shift] key and the [CTRL] key is (NOT) being pressed
+    if (!this._editedItem && !this.shiftKeyDown && !this.ctrlKeyDown) {
+      // And as long as the item itself is editable
+      if (this._selectedItem.editable == null || this._selectedItem.editable) {
+        this.editItem();
+      }
+    }
+  }
 
 
 
+  public editItem(): void {
+    if (this._selectedItem) {
+      this._editedItem = this._selectedItem;
+      this._selectedItem = null!;
+      this.addEventListeners();
+
+      this.list.forEach(x => {
+        x.selected = false;
+        x.selectType = null!;
+      })
+      this.getHtmlItemText(this._editedItem).innerText = this.getHtmlItemText(this._editedItem).innerText.trim();
+      const range = document.createRange();
+      range.selectNodeContents(this.getHtmlItemText(this._editedItem));
+      const sel = window.getSelection();
+      sel!.removeAllRanges();
+      sel!.addRange(range);
+    }
+  }
 
 
-  private setItemEdit(): void {
-    this._editedItem = this._selectedItem;
-    this._selectedItem = null!;
-    this.addEventListeners();
+  private exitItemEdit(isEscape?: boolean, isBlur?: boolean): void {
+    // If the edited item has text written in it
+    if (this.getHtmlItemText(this._editedItem).innerText.trim().length > 0) {
 
-    this.list.forEach(x => {
-      x.selected = false;
-      x.selectType = null!;
-    })
-    this.giveFocusToHtmlItemText();
+      // If we pressed the (Escape) key
+      if (isEscape) {
+
+        // If we ARE adding a new item 
+        if (this.isNewItem) {
+
+          // Remove the item
+          this.list.splice(this.list.indexOf(this._editedItem), 1);
+          this.isNewItem = false;
+          this._editedItem = null!;
+          this._selectedItem = null!;
+
+          // If we were NOT adding a new item
+        } else {
+
+          // Reset the item back to the way it was before the edit
+          this.getHtmlItemText(this._editedItem).innerText = this._editedItem.text!.trim()!;
+          this.reselectItem(this._editedItem);
+        }
+
+        // If we did NOT press the (Escape) key
+        // But the (Enter) key was pressed or the item was (Blurred)
+      } else {
+
+        // If the edited item does (NOT) have a case type assigned and there are obsservers accepting requests for case type assignments
+        if (!this._editedItem.caseType && this.requestedItemCaseTypeEvent.observers.length > 0) {
+          // Send it off to get its case type assigned
+          this.requestedItemCaseTypeEvent.emit(this._editedItem);
+          this.waitForItemCaseTypeAssignment(this._editedItem);
+
+        } else {
+          this.completeItemEdit();
+        }
+      }
+
+      // But if the item is empty
+    } else {
+
+      // If we pressed the (Escape) key or the item was (Blurred)
+      if (isEscape || isBlur) {
+
+        // If we were adding a new item
+        if (this.isNewItem) {
+
+          // Remove the item
+          this.list.splice(this.list.indexOf(this._editedItem), 1);
+          this.isNewItem = false;
+          this._editedItem = null!;
+          this._selectedItem = null!;
+          // this.unSelectedItemsUpdate();
+
+          // If we were NOT adding a new item
+        } else {
+
+          // Reset the item back to the way it was before the edit
+          this.getHtmlItemText(this._editedItem).innerText = this._editedItem.text!.trim()!;
+          this.reselectItem(this._editedItem);
+        }
+      }
+    }
+  }
+
+
+
+  private reselectItem(item: ListItem): void {
+    this.isNewItem = false;
+    if (this.options.selectable && (item.selectable == null || item.selectable)) {
+      this._selectedItem = item;
+      this._selectedItem.selected = true;
+      this.getHtmlItem(this._selectedItem)!.focus();
+      this.emitItemsSelected();
+    }
+    this._editedItem = null!;
   }
 
 
 
 
+  private waitForItemCaseTypeAssignment(item: ListItem) {
+    const caseTypeSetListener = setInterval(() => {
+      if (item.caseType) {
+        clearTimeout(timeout);
+        clearInterval(caseTypeSetListener);
+        if (item == this._editedItem) {
+          this.completeItemEdit();
+        } else {
+          this.completePastedItems();
+        }
+      }
+    });
 
-  public deleteItems() {
-    this.emitItemsDeleted();
+    // A failsafe in case the case type never gets assigned 
+    const timeout = setTimeout(() => {
+      clearInterval(caseTypeSetListener);
+    }, 5000);
+  }
+
+
+
+
+  private completeItemEdit() {
+    const oldText = this._editedItem.text;
+    this._editedItem.text = this.getCaseType(this._editedItem);
+    this.getHtmlItemText(this._editedItem).innerText = this.getHtmlItemText(this._editedItem).innerText.trim();
+
+    // As long as the edited text is different from what it was before the edit
+    if (this._editedItem.text!.trim() != oldText) {
+      if (this.options.sortable) this.sort();
+      if (this.isNewItem) {
+        this.addedItemEvent.emit(this._editedItem);
+      } {
+        this.editedItemEvent.emit(this._editedItem);
+      }
+      this.reselectItem(this._editedItem);
+
+
+      // If the text is (NOT) different from what it was before the edit
+    } else {
+      // Just reselect the item
+      this.reselectItem(this._editedItem);
+    }
+  }
+
+
+
+
+  private completePastedItems() {
+    const pastedItems = this.list.filter(x => !x.id);
+    pastedItems.forEach(x => x.text = this.getCaseType(x));
+    if (this.options.sortable) this.sort();
+    this._editedItem = null!;
+    this.pastedItemsEvent.emit(pastedItems);
+  }
+
+
+
+  private getCaseType(item: ListItem): string {
+    let text: string;
+
+    switch (item.caseType) {
+
+      // Capitalized Case
+      case CaseType.CapitalizedCase:
+        // const capCase = new CapitalizedCase();
+        // text = capCase.getCase(this.getHtmlItemText(item).innerText.trim());
+        text = this.getHtmlItemText(item).innerText.trim(); // ****** Temporary ****** \\
+        break;
+
+      // Title Case
+      case CaseType.TitleCase:
+        // const titleCase = new TitleCase();
+        // text = titleCase.getCase(this.getHtmlItemText(item).innerText.trim());
+        text = this.getHtmlItemText(item).innerText.trim(); // ****** Temporary ****** \\
+        break;
+
+      // Lower Case
+      case CaseType.LowerCase:
+        text = this.getHtmlItemText(item).innerText.trim().toLowerCase();
+        break;
+
+      // No Case
+      default:
+        text = this.getHtmlItemText(item).innerText.trim();
+        break;
+    }
+    return text;
+  }
+
+
+
+  public deleteItem() {
+    const deletedItems = this.list.filter(x => x.selected == true);
+    this.deletedItemsEvent.emit(deletedItems);
     const nextSelectedItem = this.getNextSelectedItemAfterDelete();
     this.list = this.list.filter(x => !x.selected);
 
@@ -668,25 +860,6 @@ export class ListComponent {
       }
     }
   }
-
-
-
-
-  private reselectItem(item: ListItem): void {
-    this.newItem = false;
-    if (this.options.selectable) {
-      this._selectedItem = item;
-      this._selectedItem.selected = true;
-
-      window.setTimeout(() => {
-        this._selectedItem.htmlItem?.focus();
-      });
-
-      this.emitItemsSelected();
-    }
-    this._editedItem = null!;
-  }
-
 
 
 
@@ -711,210 +884,197 @@ export class ListComponent {
 
 
 
-
-
-  public onItemDoubleClick(): void {
-    // As long as an item is (NOT) being edited and the [shift] key and the [CTRL] key is (NOT) being pressed
-    if (!this._editedItem && !this.shiftKeyDown && !this.ctrlKeyDown) {
-      // And as long as the item itself is editable
-      if (this._selectedItem.editable == null || this._selectedItem.editable) {
-        this.setItemEdit();
-      }
-    }
-  }
-
-
-
-  public getEditedItem(): ListItem {
-    return this._editedItem;
-  }
-
-  public getHtmlItemText(): HTMLElement {
-    return this._editedItem.htmlItemText!;
-  }
-
-
-  private giveFocusToHtmlItemText(): void {
-    if (this.newItem) {
-      this.getHtmlItemText().focus();
-
-    } else {
-
-      const range = document.createRange();
-      range.selectNodeContents(this.getHtmlItemText());
-      const sel = window.getSelection();
-      sel!.removeAllRanges();
-      sel!.addRange(range);
-    }
-  }
-
-
-
-
-
-
-
-  private getCase(): string {
-    let text: string;
-
-    switch (this._editedItem.case) {
-
-      // Capitalized Case
-      case CaseType.CapitalizedCase:
-        // const capCase = new CapitalizedCase();
-        // text = capCase.getCase(this.getHtmlItem().innerText.trim());
-        text = this.getHtmlItemText().innerText.trim(); // ****** Temporary ****** \\
-        break;
-
-      // Title Case
-      case CaseType.TitleCase:
-        // const titleCase = new TitleCase();
-        // text = titleCase.getCase(this.getHtmlItem().innerText.trim());
-        text = this.getHtmlItemText().innerText.trim(); // ****** Temporary ****** \\
-        break;
-
-      // Lower Case
-      case CaseType.LowerCase:
-        text = this.getHtmlItemText().innerText.trim().toLowerCase();
-        break;
-
-      // No Case
-      default:
-        text = this.getHtmlItemText().innerText.trim();
-        break;
-    }
-    return text;
-  }
-
-
-
-  public sort(): void {
-    this.getHtmlItemText().innerText = this.getEditedItem().text!.trim()!;
-    this.list.sort((a, b) => (a.text! > b.text!) ? 1 : -1);
-  }
-
-
-
-  public exitItemEdit(isEscape?: boolean, isBlur?: boolean): void {
-    const trimmedEditedItem = this.getHtmlItemText().innerText.trim();
-
-    // If the edited item has text written in it
-    if (trimmedEditedItem.length > 0) {
-
-      // If we pressed the (Escape) key
-      if (isEscape) {
-
-        // If we ARE adding a new item 
-        if (this.newItem) {
-
-          // Remove the item
-          this.list.splice(this.list.indexOf(this._editedItem), 1);
-          this.newItem = false;
-          this._editedItem = null!;
-          this._selectedItem = null!;
-
-          // If we were NOT adding a new item
-        } else {
-
-          // Reset the item back to the way it was before the edit
-          this.getHtmlItemText().innerText = this.getEditedItem().text!.trim()!;
-          this.reselectItem(this._editedItem);
-        }
-
-        // If we did NOT press the (Escape) key
-        // But the (Enter) key was pressed or the item was (Blurred)
-      } else {
-
-        // As long as a list was (NOT) pasted into the item
-        if (!this.getEditedItem().pastedItems) {
-
-          // As long as the edited text is different from what it was before the edit
-          if (trimmedEditedItem.toLowerCase() != this.getEditedItem().text!.trim().toLowerCase()) {
-            this.completeItemEdit();
-
-            // If the edited text has NOT changed
-          } else {
-
-            //But if the case was changed. i.e. lower case to upper case
-            if (trimmedEditedItem != this.getEditedItem().text!.trim()) {
-              this.getEditedItem().text = this.getCase();
-              this.completeItemEdit();
-            }
-            this.reselectItem(this._editedItem);
-          }
-        }
-      }
-
-      // But if the item is empty
-    } else {
-
-      // If we pressed the (Escape) key or the item was (Blurred)
-      if (isEscape || isBlur) {
-
-        // If we were adding a new item
-        if (this.newItem) {
-
-          // Remove the item
-          this.list.splice(this.list.indexOf(this._editedItem), 1);
-          this.newItem = false;
-          this._editedItem = null!;
-          this._selectedItem = null!;
-          // this.unSelectedItemsUpdate();
-
-          // If we were NOT adding a new item
-        } else {
-
-          // Reset the item back to the way it was before the edit
-          this.getHtmlItemText().innerText = this.getEditedItem().text!.trim()!;
-          this.reselectItem(this._editedItem);
-        }
-      }
-    }
-  }
-
-
-
-
-  private completeItemEdit(): void {
-    // Update the text property
-    this.getEditedItem().text = this.getCase();
-
-
-    // As long as the list is sortable
-    if (this.options.sortable) {
-
-      // Sort the list
-      this.sort()!
-    }
-
-    this.emitItemEdited();
-    this.reselectItem(this._editedItem);
-  }
-
-
-
-  private emitItemsSelected() {
-    const selectedItems = this.list.filter(x => x.selected == true);
-    this.selectedItemsEvent.emit(selectedItems);
-  }
-
-
-  private emitItemEdited() {
-    this.editedItemEvent.emit(this.editedItem);
-  }
-
-
-
   private emitPressedDeleteKey() {
-    if (!this.editedItem && this.options.deletable) {
+    if (!this._editedItem && this.options.deletable) {
       const itemsToBeDeleted = this.list.filter(x => x.selected == true);
       this.pressedDeleteKeyEvent.emit(itemsToBeDeleted);
     }
   }
 
 
-  private emitItemsDeleted() {
-    const deletedItems = this.list.filter(x => x.selected == true);
-    this.deletedItemsEvent.emit(deletedItems);
+
+  public onScroll(listContainer: HTMLElement) {
+    const scrollPosition = listContainer.scrollTop + listContainer.clientHeight;
+    const scrollDirection = Math.max(-1, Math.min(1, (listContainer.scrollTop - this.newScrollTop)));
+
+    // Iterate through all the pages
+    for (let i = 1; i < this.loadedPages.length; i++) {
+      // Find the page the scroll is currently on
+      if (scrollPosition >= this.pageStart(i) && scrollPosition < this.pageEnd(i)) {
+        // If the page that's (after or before) the page we're on does (NOT) exist
+        if (i + scrollDirection > 0 && !this.loadedPages[i + scrollDirection]) {
+          // Then load it
+          // this.LoadPage(i + scrollDirection);
+        }
+        break;
+      }
+    }
+    // Record the new position of the scroll top (Used for determining the direction the scrollbar is moving)
+    this.newScrollTop = listContainer.scrollTop;
+  }
+
+
+  private pageStart(i: number): number {
+    return (this.options.itemsPerPage! * this.options.itemHeight!) * (i - 1);
+  }
+
+
+  private pageEnd(i: number): number {
+    return (this.options.itemsPerPage! * this.options.itemHeight!) * i;
+  }
+
+
+
+
+
+
+
+  private onPaste = (e: Event): void => {
+    if (this._editedItem) {
+      e.preventDefault();
+
+      // Record the clipboard data
+      const clipboardData = (e as ClipboardEvent).clipboardData!.getData('text/plain').trim();
+
+      // As long as there is clipboard data (and not an empty string)
+      if (clipboardData) {
+
+        // If text was pasted into a (NEW) item
+        if (this.isNewItem) {
+
+          // Convert the clipboard data into an array anywhere there is a newline detected (if any)
+          const clipboardDataList = clipboardData.split("\n");
+
+          // If the array has more than one element (that would mean a list was pasted in)
+          if (clipboardDataList.length > 1) {
+            this.pasteClipboardDataList(clipboardDataList);
+
+            // But if the array has only one element (that would mean a list was (NOT) pasted in)
+          } else {
+            this.pasteClipboardData(clipboardData);
+          }
+          // If text was pasted into an edited item
+        } else {
+          this.pasteClipboardData(clipboardData);
+        }
+      }
+    }
+  }
+
+
+
+  private pasteClipboardDataList(clipboardDataList: Array<string>) {
+    const index = this.list.indexOf(this._editedItem);
+    this._editedItem = null!;
+
+    // Wait a frame to allow the new item to exit edit mode
+    window.setTimeout(() => {
+      this.isNewItem = false;
+
+      // Remove \r anywhere it is found (if any)
+      clipboardDataList.forEach((x, i, arry) => {
+        arry[i] = x.replace('\r', '');
+      })
+
+      // Remove the duplicate items (if any)
+      let uniqueClipboardDataList = [...new Set(clipboardDataList)];
+
+      // Add the first pasted item to the list (this is using the new item that was just created)
+      this.list[index].text = uniqueClipboardDataList[0];
+
+      // Then add the rest of the pasted items to the list
+      for (let i = index + 1; i < uniqueClipboardDataList.length; i++) {
+        this.list.splice(i, 0, new ListItem(uniqueClipboardDataList[i]));
+      }
+      if (this.options.sortable) this.sort();
+
+      // Wait a frame to allow all the pasted items to be rendered into the html
+      window.setTimeout(() => {
+
+        // If any obsservers are accepting requests for case type assignment
+        if (this.requestedItemCaseTypeEvent.observers.length > 0) {
+          // Once every pasted item has been renered into the html
+          for (let i = index; i < uniqueClipboardDataList.length; i++) {
+            // Send them off to get their case type assigned
+            this.requestedItemCaseTypeEvent.emit(this.list[i]);
+          }
+
+          // Wait a frame to allow all the pasted items to get their case type assigned
+          window.setTimeout(() => {
+            const pastedItems = this.list.filter(x => !x.id);
+            pastedItems.forEach(x => x.text = this.getCaseType(x));
+            this.pastedItemsEvent.emit(pastedItems);
+          })
+        }
+      });
+    })
+  }
+
+
+
+  private pasteClipboardData(clipboardData: string) {
+    const sel = window.getSelection();
+    const range = document.createRange();
+    const textBeforeCaret = this.getHtmlItemText(this._editedItem).innerText.substring(0, this.htmlItemTextSelection.anchorOffset);
+    const textAfterCaret = this.getHtmlItemText(this._editedItem).innerText.substring(this.htmlItemTextSelection.focusOffset);
+
+    // Insert the clipboard data into the text
+    this.getHtmlItemText(this._editedItem).innerText = textBeforeCaret + clipboardData + textAfterCaret;
+
+    // Reposition the caret to reside after the clipboard data
+    range.setStart(this.getHtmlItemText(this._editedItem).childNodes[0], (textBeforeCaret + clipboardData).length)
+    sel!.removeAllRanges();
+    sel!.addRange(range);
+  }
+
+
+
+  private getHtmlItem(item: ListItem) {
+    const index = this.list.indexOf(item);
+    return this.htmlItems.get(index)?.nativeElement;
+  }
+
+
+
+  private getHtmlItemText(item: ListItem): HTMLElement {
+    const index = this.list.indexOf(item);
+    return this.htmlItemTexts.get(index)?.nativeElement!;
+  }
+
+
+  public getHtmlItemTextSelection() {
+    if (this._editedItem) {
+      window.setTimeout(() => {
+        this.htmlItemTextSelection = window.getSelection()!;
+      })
+    }
+  }
+
+
+  private sort(): void {
+    this.list.sort((a, b) => (a.text! > b.text!) ? 1 : -1);
+  }
+
+
+
+  private reinitializeList(): void {
+    if (this.options.unselectable) {
+      this.pivotItem = null!;
+      this._editedItem = null!;
+      this.ctrlKeyDown = false;
+      this._selectedItem = null!;
+      this.shiftKeyDown = false;
+      this._unselectedItem = null!;
+      this.eventListenersAdded = false;
+
+      this.list.forEach(x => {
+        x.selected = false;
+        x.selectType = null!;
+      });
+      window.removeEventListener('keyup', this.onKeyUp);
+      window.removeEventListener('paste', this.onPaste);
+      window.removeEventListener('keydown', this.onKeyDown);
+      window.removeEventListener('mousedown', this.onMouseDown);
+    }
   }
 }
