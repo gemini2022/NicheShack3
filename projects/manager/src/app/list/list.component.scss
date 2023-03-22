@@ -11,11 +11,11 @@
     outline: none;
     user-select: none;
     align-items: center;
-    border: 1px solid transparent;
+    border: solid transparent;
     color: rgb(var(--textColorR), var(--textColorG), var(--textColorB));
 
     &:hover:not(.edited-item):not(.unselected-item):not(.primary-selection):not(.secondary-selection-all):not(.secondary-selection-top):not(.secondary-selection-middle):not(.secondary-selection-bottom):not(.primary-selection-border):not(.disabled-item) {
-        background: rgba(var(--hoverColorR), var(--hoverColorG), var(--hoverColorB), 0.03);
+        background: rgba(var(--hoverColorR), var(--hoverColorG), var(--hoverColorB), var(--hoverColorA));
         color: rgb(calc(var(--textColorR) + 50), calc(var(--textColorG) + 50), calc(var(--textColorB) + 50));
     }
 }
@@ -34,7 +34,7 @@
 
 .unselected-item {
     color: #a0a0a0;
-    border-color: rgba(var(--selectionColorR), var(--selectionColorG), var(--selectionColorB), 0.851);
+    border-color: rgba(var(--borderColorR), var(--borderColorG), var(--borderColorB), var(--borderColorA));
 
     &:hover {
         background: rgba(var(--hoverColorR), var(--hoverColorG), var(--hoverColorB), 0.03);
@@ -43,54 +43,53 @@
 }
 
 
-
 .primary-selection {
-    background: rgba(var(--selectionColorR), var(--selectionColorG), var(--selectionColorB), 0.1);
-    border-color: rgba(var(--selectionColorR), var(--selectionColorG), var(--selectionColorB), 0.85);
+    background: rgba(var(--fillColorR), var(--fillColorG), var(--fillColorB), var(--fillColorA));
     color: rgb(calc(var(--textColorR) + 95), calc(var(--textColorG) + 95), calc(var(--textColorB) + 95));
+    border-color: rgba(var(--borderColorR), var(--borderColorG), var(--borderColorB), var(--borderColorA));
 }
 
 
 
 .secondary-selection-all:not(.primary-selection) {
-    background: rgba(var(--selectionColorR), var(--selectionColorG), var(--selectionColorB), 0.05);
-    border-color: rgba(var(--selectionColorR), var(--selectionColorG), var(--selectionColorB), 0.25);
     color: rgb(calc(var(--textColorR) + 46), calc(var(--textColorG) + 46), calc(var(--textColorB) + 46));
+    background: rgba(var(--secondaryFillColorR), var(--secondaryFillColorG), var(--secondaryFillColorB), var(--secondaryFillColorA));
+    border-color: rgba(var(--secondaryBorderColorR), var(--secondaryBorderColorG), var(--secondaryBorderColorB), var(--secondaryBorderColorA));
 }
 
 
 
 .secondary-selection-top:not(.primary-selection) {
-    background: rgba(var(--selectionColorR), var(--selectionColorG), var(--selectionColorB), 0.05);
     color: rgb(calc(var(--textColorR) + 46), calc(var(--textColorG) + 46), calc(var(--textColorB) + 46));
-    border-top-color: rgba(var(--selectionColorR), var(--selectionColorG), var(--selectionColorB), 0.25);
-    border-left-color: rgba(var(--selectionColorR), var(--selectionColorG), var(--selectionColorB), 0.25);
-    border-right-color: rgba(var(--selectionColorR), var(--selectionColorG), var(--selectionColorB), 0.25);
+    background: rgba(var(--secondaryFillColorR), var(--secondaryFillColorG), var(--secondaryFillColorB), var(--secondaryFillColorA));
+    border-top-color: rgba(var(--secondaryBorderColorR), var(--secondaryBorderColorG), var(--secondaryBorderColorB), var(--secondaryBorderColorA));
+    border-left-color: rgba(var(--secondaryBorderColorR), var(--secondaryBorderColorG), var(--secondaryBorderColorB), var(--secondaryBorderColorA));
+    border-right-color: rgba(var(--secondaryBorderColorR), var(--secondaryBorderColorG), var(--secondaryBorderColorB), var(--secondaryBorderColorA));
 }
 
 
 
 .secondary-selection-middle:not(.primary-selection) {
-    background: rgba(var(--selectionColorR), var(--selectionColorG), var(--selectionColorB), 0.05);
     color: rgb(calc(var(--textColorR) + 46), calc(var(--textColorG) + 46), calc(var(--textColorB) + 46));
-    border-left-color: rgba(var(--selectionColorR), var(--selectionColorG), var(--selectionColorB), 0.25);
-    border-right-color: rgba(var(--selectionColorR), var(--selectionColorG), var(--selectionColorB), 0.25);
+    background: rgba(var(--secondaryFillColorR), var(--secondaryFillColorG), var(--secondaryFillColorB), var(--secondaryFillColorA));
+    border-left-color: rgba(var(--secondaryBorderColorR), var(--secondaryBorderColorG), var(--secondaryBorderColorB), var(--secondaryBorderColorA));
+    border-right-color: rgba(var(--secondaryBorderColorR), var(--secondaryBorderColorG), var(--secondaryBorderColorB), var(--secondaryBorderColorA));
 }
 
 
 
 .secondary-selection-bottom:not(.primary-selection) {
-    background: rgba(var(--selectionColorR), var(--selectionColorG), var(--selectionColorB), 0.05);
     color: rgb(calc(var(--textColorR) + 46), calc(var(--textColorG) + 46), calc(var(--textColorB) + 46));
-    border-left-color: rgba(var(--selectionColorR), var(--selectionColorG), var(--selectionColorB), 0.25);
-    border-right-color: rgba(var(--selectionColorR), var(--selectionColorG), var(--selectionColorB), 0.25);
-    border-bottom-color: rgba(var(--selectionColorR), var(--selectionColorG), var(--selectionColorB), 0.25);
+    background: rgba(var(--secondaryFillColorR), var(--secondaryFillColorG), var(--secondaryFillColorB), var(--secondaryFillColorA));
+    border-left-color: rgba(var(--secondaryBorderColorR), var(--secondaryBorderColorG), var(--secondaryBorderColorB), var(--secondaryBorderColorA));
+    border-right-color: rgba(var(--secondaryBorderColorR), var(--secondaryBorderColorG), var(--secondaryBorderColorB), var(--secondaryBorderColorA));
+    border-bottom-color: rgba(var(--secondaryBorderColorR), var(--secondaryBorderColorG), var(--secondaryBorderColorB), var(--secondaryBorderColorA));
 }
 
 
 
 .primary-selection-border-only {
-    border-color: rgba(var(--selectionColorR), var(--selectionColorG), var(--selectionColorB), 0.85);
+    border-color: rgba(var(--borderColorR), var(--borderColorG), var(--borderColorB), var(--borderColorA));
     color: rgb(calc(var(--textColorR) + 95), calc(var(--textColorG) + 95), calc(var(--textColorB) + 95));
 }
 
@@ -122,5 +121,5 @@
 
 .edited-item-text {
     background: #2b2b2b;
-    border-color: rgba(var(--selectionColorR), var(--selectionColorG), var(--selectionColorB), 0.25);
+    border-color: rgba(var(--secondaryBorderColorR), var(--secondaryBorderColorG), var(--secondaryBorderColorB), var(--secondaryBorderColorA));
 }

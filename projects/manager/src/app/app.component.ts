@@ -1,8 +1,11 @@
 import { Component, ViewChild } from '@angular/core';
+import { Color } from './color';
 import { CaseType } from './enums';
 import { ListItem } from './list-item';
 import { ListComponent } from './list/list.component';
+import { ManagerListOptions } from './manager-list-options';
 import { PageLoad } from './page-load';
+import { WebsiteListOptions } from './website-list-options';
 
 @Component({
   selector: 'app-root',
@@ -14,6 +17,9 @@ export class AppComponent {
   public testList: Array<ListItem> = new Array<ListItem>();
   private listLength!: number;
 
+  // public listOptions = new ManagerListOptions();
+
+  public listOptions = new WebsiteListOptions();
 
 
 
@@ -81,17 +87,16 @@ export class AppComponent {
 
 
   onRequestedItemCaseType(item: ListItem) {
-
-    
-
-    // window.setTimeout(()=> {
-    //   console.log('hello')
     item.caseType = CaseType.TitleCase;
-    // },4500)
   }
 
 
-  onPastedItems(pastedItems: Array<ListItem>){
-    console.log(pastedItems)
+  onUnselectedList() {
+    // console.log('list unselected')
+  }
+
+
+  onPastedItems(pastedItems: Array<ListItem>) {
+    // console.log(pastedItems)
   }
 }

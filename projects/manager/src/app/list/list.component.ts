@@ -3,7 +3,7 @@ import { ListItem } from '../list-item';
 import { PageLoad } from '../page-load';
 import { ListOptions } from '../list-options';
 import { CaseType, ItemSelectType } from '../enums';
-import { Component, ElementRef, EventEmitter, Input, Output, QueryList, SimpleChanges, ViewChild, ViewChildren } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, Output, QueryList, SimpleChanges, ViewChildren } from '@angular/core';
 
 @Component({
   selector: 'list',
@@ -32,29 +32,32 @@ export class ListComponent {
   public get selectedItem(): ListItem { return this._selectedItem; }
   public get unselectedItem(): ListItem { return this._unselectedItem; }
 
-  // Decorators
-  @Input() public list!: Array<ListItem>;
-  @Input() public options: ListOptions = new ListOptions();
-  @ViewChildren('htmlItem') private htmlItems!: QueryList<ElementRef<HTMLElement>>;
-  @ViewChildren('htmlItemText') private htmlItemTexts!: QueryList<ElementRef<HTMLElement>>;
-
   // Events
   @Output() public addedItemEvent: EventEmitter<ListItem> = new EventEmitter();
   @Output() public editedItemEvent: EventEmitter<ListItem> = new EventEmitter();
+  @Output() public unselectedListEvent: EventEmitter<void> = new EventEmitter();
   @Output() public pressedEnterKeyEvent: EventEmitter<ListItem> = new EventEmitter();
-  @Output() public requestedPageLoadEvent: EventEmitter<PageLoad> = new EventEmitter();
   @Output() public rightClickedItemEvent: EventEmitter<ListItem> = new EventEmitter();
+  @Output() public requestedPageLoadEvent: EventEmitter<PageLoad> = new EventEmitter();
   @Output() public pastedItemsEvent: EventEmitter<Array<ListItem>> = new EventEmitter();
   @Output() public deletedItemsEvent: EventEmitter<Array<ListItem>> = new EventEmitter();
   @Output() public selectedItemsEvent: EventEmitter<Array<ListItem>> = new EventEmitter();
   @Output() public requestedItemCaseTypeEvent: EventEmitter<ListItem> = new EventEmitter();
   @Output() public pressedDeleteKeyEvent: EventEmitter<Array<ListItem>> = new EventEmitter();
 
+  // View Children
+  @ViewChildren('htmlItem') private htmlItems!: QueryList<ElementRef<HTMLElement>>;
+  @ViewChildren('htmlItemText') private htmlItemTexts!: QueryList<ElementRef<HTMLElement>>;
+
+  // Inputs
+  @Input() public list!: Array<ListItem>;
+  @Input() public options: ListOptions = new ListOptions();
 
 
 
-
+  
   private ngOnChanges(changes: SimpleChanges) {
+    // If any of the default options have been changed
     if (changes.options) this.options = new ListOptions(changes.options.currentValue);
   }
 
@@ -668,39 +671,30 @@ export class ListComponent {
   }
 
 
+
+
   private exitItemEdit(isEscape?: boolean, isBlur?: boolean): void {
     // If the edited item has text written in it
     if (this.getHtmlItemText(this._editedItem).innerText.trim().length > 0) {
 
-      // If we pressed the (Escape) key
+      // If we pressed the [ESCAPE] key
       if (isEscape) {
+        // Cancel the edit
+        this.cancelItemEdit();
 
-        // If we ARE adding a new item 
-        if (this.isNewItem) {
-
-          // Remove the item
-          this.list.splice(this.list.indexOf(this._editedItem), 1);
-          this.isNewItem = false;
-          this._editedItem = null!;
-          this._selectedItem = null!;
-
-          // If we were NOT adding a new item
-        } else {
-
-          // Reset the item back to the way it was before the edit
-          this.getHtmlItemText(this._editedItem).innerText = this._editedItem.text!.trim()!;
-          this.reselectItem(this._editedItem);
-        }
-
-        // If we did NOT press the (Escape) key
-        // But the (Enter) key was pressed or the item was (Blurred)
+        // If we did (NOT) press the [ESCAPE] key
+        // But the [ENTER] key was pressed or the item was {BLURRED}
       } else {
 
         // If the edited item does (NOT) have a case type assigned and there are obsservers accepting requests for case type assignments
         if (!this._editedItem.caseType && this.requestedItemCaseTypeEvent.observers.length > 0) {
           // Send it off to get its case type assigned
           this.requestedItemCaseTypeEvent.emit(this._editedItem);
-          this.waitForItemCaseTypeAssignment(this._editedItem);
+
+          // Wait a frame to allow the item to get its case type assigned
+          window.setTimeout(() => {
+            this.completeItemEdit();
+          })
 
         } else {
           this.completeItemEdit();
@@ -710,27 +704,31 @@ export class ListComponent {
       // But if the item is empty
     } else {
 
-      // If we pressed the (Escape) key or the item was (Blurred)
+      // If we pressed the [ESCAPE] key or the item was {BLURRED}
       if (isEscape || isBlur) {
-
-        // If we were adding a new item
-        if (this.isNewItem) {
-
-          // Remove the item
-          this.list.splice(this.list.indexOf(this._editedItem), 1);
-          this.isNewItem = false;
-          this._editedItem = null!;
-          this._selectedItem = null!;
-          // this.unSelectedItemsUpdate();
-
-          // If we were NOT adding a new item
-        } else {
-
-          // Reset the item back to the way it was before the edit
-          this.getHtmlItemText(this._editedItem).innerText = this._editedItem.text!.trim()!;
-          this.reselectItem(this._editedItem);
-        }
+        // Cancel the edit
+        this.cancelItemEdit();
       }
+    }
+  }
+
+
+
+
+  private cancelItemEdit() {
+    // If we're adding a new item 
+    if (this.isNewItem) {
+
+      // Remove the item
+      this.list.splice(this.list.indexOf(this._editedItem), 1);
+      this.reinitializeList();
+
+      // If we were (NOT) adding a new item
+    } else {
+
+      // Reset the item back to the way it was before the edit
+      this.getHtmlItemText(this._editedItem).innerText = this._editedItem.text!.trim()!;
+      this.reselectItem(this._editedItem);
     }
   }
 
@@ -747,27 +745,6 @@ export class ListComponent {
     this._editedItem = null!;
   }
 
-
-
-
-  private waitForItemCaseTypeAssignment(item: ListItem) {
-    const caseTypeSetListener = setInterval(() => {
-      if (item.caseType) {
-        clearTimeout(timeout);
-        clearInterval(caseTypeSetListener);
-        if (item == this._editedItem) {
-          this.completeItemEdit();
-        } else {
-          this.completePastedItems();
-        }
-      }
-    });
-
-    // A failsafe in case the case type never gets assigned 
-    const timeout = setTimeout(() => {
-      clearInterval(caseTypeSetListener);
-    }, 5000);
-  }
 
 
 
@@ -1057,10 +1034,17 @@ export class ListComponent {
 
 
 
+
+
+
+
+
   private reinitializeList(): void {
+    this.isNewItem = false;
+    this._editedItem = null!;
+
     if (this.options.unselectable) {
       this.pivotItem = null!;
-      this._editedItem = null!;
       this.ctrlKeyDown = false;
       this._selectedItem = null!;
       this.shiftKeyDown = false;
@@ -1071,6 +1055,8 @@ export class ListComponent {
         x.selected = false;
         x.selectType = null!;
       });
+
+      this.unselectedListEvent.emit();
       window.removeEventListener('keyup', this.onKeyUp);
       window.removeEventListener('paste', this.onPaste);
       window.removeEventListener('keydown', this.onKeyDown);
