@@ -12,11 +12,11 @@
     user-select: none;
     align-items: center;
     border: solid transparent;
-    color: rgb(var(--textColorR), var(--textColorG), var(--textColorB));
+    color: rgb(var(--textColorR), var(--textColorG), var(--textColorB), var(--textColorA));
 
     &:hover:not(.edited-item):not(.unselected-item):not(.primary-selection):not(.secondary-selection-all):not(.secondary-selection-top):not(.secondary-selection-middle):not(.secondary-selection-bottom):not(.primary-selection-border):not(.disabled-item) {
         background: rgba(var(--hoverColorR), var(--hoverColorG), var(--hoverColorB), var(--hoverColorA));
-        color: rgb(calc(var(--textColorR) + 50), calc(var(--textColorG) + 50), calc(var(--textColorB) + 50));
+        color: rgb(calc(var(--textColorR) + 50), calc(var(--textColorG) + 50), calc(var(--textColorB) + 50), var(--textColorA));
     }
 }
 
@@ -27,7 +27,7 @@
     border-right: none;
     background: #202020;
     border-color: transparent;
-    color: rgb(calc(var(--textColorR) + 61), calc(var(--textColorG) + 61), calc(var(--textColorB) + 61));
+    color: rgb(calc(var(--textColorR) + 61), calc(var(--textColorG) + 61), calc(var(--textColorB) + 61), var(--textColorA));
 }
 
 
@@ -38,21 +38,21 @@
 
     &:hover {
         background: rgba(var(--hoverColorR), var(--hoverColorG), var(--hoverColorB), 0.03);
-        color: rgb(calc(var(--textColorR) + 46), calc(var(--textColorG) + 46), calc(var(--textColorB) + 46));
+        color: rgb(calc(var(--textColorR) + 46), calc(var(--textColorG) + 46), calc(var(--textColorB) + 46), var(--textColorA));
     }
 }
 
 
 .primary-selection {
     background: rgba(var(--fillColorR), var(--fillColorG), var(--fillColorB), var(--fillColorA));
-    color: rgb(calc(var(--textColorR) + 95), calc(var(--textColorG) + 95), calc(var(--textColorB) + 95));
     border-color: rgba(var(--borderColorR), var(--borderColorG), var(--borderColorB), var(--borderColorA));
+    color: rgb(calc(var(--textColorR) + 95), calc(var(--textColorG) + 95), calc(var(--textColorB) + 95), var(--textColorA));
 }
 
 
 
 .secondary-selection-all:not(.primary-selection) {
-    color: rgb(calc(var(--textColorR) + 46), calc(var(--textColorG) + 46), calc(var(--textColorB) + 46));
+    color: rgb(calc(var(--textColorR) + 46), calc(var(--textColorG) + 46), calc(var(--textColorB) + 46), var(--textColorA));
     background: rgba(var(--secondaryFillColorR), var(--secondaryFillColorG), var(--secondaryFillColorB), var(--secondaryFillColorA));
     border-color: rgba(var(--secondaryBorderColorR), var(--secondaryBorderColorG), var(--secondaryBorderColorB), var(--secondaryBorderColorA));
 }
@@ -60,7 +60,7 @@
 
 
 .secondary-selection-top:not(.primary-selection) {
-    color: rgb(calc(var(--textColorR) + 46), calc(var(--textColorG) + 46), calc(var(--textColorB) + 46));
+    color: rgb(calc(var(--textColorR) + 46), calc(var(--textColorG) + 46), calc(var(--textColorB) + 46), var(--textColorA));
     background: rgba(var(--secondaryFillColorR), var(--secondaryFillColorG), var(--secondaryFillColorB), var(--secondaryFillColorA));
     border-top-color: rgba(var(--secondaryBorderColorR), var(--secondaryBorderColorG), var(--secondaryBorderColorB), var(--secondaryBorderColorA));
     border-left-color: rgba(var(--secondaryBorderColorR), var(--secondaryBorderColorG), var(--secondaryBorderColorB), var(--secondaryBorderColorA));
@@ -70,7 +70,7 @@
 
 
 .secondary-selection-middle:not(.primary-selection) {
-    color: rgb(calc(var(--textColorR) + 46), calc(var(--textColorG) + 46), calc(var(--textColorB) + 46));
+    color: rgb(calc(var(--textColorR) + 46), calc(var(--textColorG) + 46), calc(var(--textColorB) + 46), var(--textColorA));
     background: rgba(var(--secondaryFillColorR), var(--secondaryFillColorG), var(--secondaryFillColorB), var(--secondaryFillColorA));
     border-left-color: rgba(var(--secondaryBorderColorR), var(--secondaryBorderColorG), var(--secondaryBorderColorB), var(--secondaryBorderColorA));
     border-right-color: rgba(var(--secondaryBorderColorR), var(--secondaryBorderColorG), var(--secondaryBorderColorB), var(--secondaryBorderColorA));
@@ -79,7 +79,7 @@
 
 
 .secondary-selection-bottom:not(.primary-selection) {
-    color: rgb(calc(var(--textColorR) + 46), calc(var(--textColorG) + 46), calc(var(--textColorB) + 46));
+    color: rgb(calc(var(--textColorR) + 46), calc(var(--textColorG) + 46), calc(var(--textColorB) + 46), var(--textColorA));
     background: rgba(var(--secondaryFillColorR), var(--secondaryFillColorG), var(--secondaryFillColorB), var(--secondaryFillColorA));
     border-left-color: rgba(var(--secondaryBorderColorR), var(--secondaryBorderColorG), var(--secondaryBorderColorB), var(--secondaryBorderColorA));
     border-right-color: rgba(var(--secondaryBorderColorR), var(--secondaryBorderColorG), var(--secondaryBorderColorB), var(--secondaryBorderColorA));
@@ -90,7 +90,7 @@
 
 .primary-selection-border-only {
     border-color: rgba(var(--borderColorR), var(--borderColorG), var(--borderColorB), var(--borderColorA));
-    color: rgb(calc(var(--textColorR) + 95), calc(var(--textColorG) + 95), calc(var(--textColorB) + 95));
+    color: rgb(calc(var(--textColorR) + 95), calc(var(--textColorG) + 95), calc(var(--textColorB) + 95), var(--textColorA));
 }
 
 

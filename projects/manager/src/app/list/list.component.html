@@ -1,67 +1,67 @@
 <div #listContainer
      class="list-container"
      (scroll)="onScroll(listContainer)"
+     (wheel)="onMouseWheel($event, listContainer)"
      (mousedown)="onListContainerMouseDown($event, listContainer)">
 
      <div *ngFor="let item of list"
           #htmlItem
           class="item"
-          [style.borderWidth.px]="options.borderWidth"
           tabindex="-1"
           (dblclick)="onItemDoubleClick()"
           [style.height.px]="options.itemHeight"
           (mousedown)="onItemSelect(item, $event)"
           (contextmenu)="$event.preventDefault();"
+          [style.borderWidth.px]="item.selectionBorderWidth ? item.selectionBorderWidth: options.selectionBorderWidth"
           [ngClass]="{'edited-item': item == editedItem,
-                      'unselected-item': item == unselectedItem,
-                      'primary-selection': item == selectedItem && item.selected,
+                      'unselected-item': item == unselectedItem && item.showSelection != false,
+                      'primary-selection': item == selectedItem && item.selected && item.showSelection != false,
                       'secondary-selection-all': item.selectType == SelectType.All,
                       'secondary-selection-top': item.selectType == SelectType.Top,
                       'secondary-selection-middle': item.selectType == SelectType.Middle,
                       'secondary-selection-bottom': item.selectType == SelectType.Bottom,
-                      'disabled-item': (editedItem && editedItem != item) || item.disabled,
-                      'primary-selection-border-only': item == selectedItem && !item.selected}"
-          [style]="'--fillColorR:' + (item.fillColor ? item.fillColor.r : options.fillColor!.r) + ';' +
-                   '--fillColorG:' + (item.fillColor ? item.fillColor.g : options.fillColor!.g) + ';' +
-                   '--fillColorB:' + (item.fillColor ? item.fillColor.b : options.fillColor!.b) + ';' +
-                   '--fillColorA:' + (item.fillColor ? item.fillColor.a : options.fillColor!.a) + ';' +
+                      'disabled-item': editedItem && editedItem != item,
+                      'primary-selection-border-only': item == selectedItem && !item.selected && item.showSelection != false}"
+          [ngStyle]="{'cursor': item.cursor ? item.cursor : options.cursor}"
+          [style.paddingLeft.px]="options.indent! - (options.selectionBorderWidth! + 1)"
+          [style]="'--textColorR:' + (item.textColor ? item.textColor.r : options.textColor!.r) + ';' + 
+                   '--textColorG:' + (item.textColor ? item.textColor.g : options.textColor!.g) + ';' +
+                   '--textColorB:' + (item.textColor ? item.textColor.b : options.textColor!.b) + ';' +
+                   '--textColorA:' + (item.textColor ? item.textColor.a : options.textColor!.a) + ';' +
                    '--hoverColorR:' + (item.hoverColor ? item.hoverColor.r : options.hoverColor!.r) + ';' +
                    '--hoverColorG:' + (item.hoverColor ? item.hoverColor.g : options.hoverColor!.g) + ';' +
                    '--hoverColorB:' + (item.hoverColor ? item.hoverColor.b : options.hoverColor!.b) + ';' +
                    '--hoverColorA:' + (item.hoverColor ? item.hoverColor.a : options.hoverColor!.a) + ';' +
-                   '--borderColorR:' + (item.borderColor ? item.borderColor.r : options.borderColor!.r) + ';' +
-                   '--borderColorG:' + (item.borderColor ? item.borderColor.g : options.borderColor!.g) + ';' +
-                   '--borderColorB:' + (item.borderColor ? item.borderColor.b : options.borderColor!.b) + ';' +
-                   '--borderColorA:' + (item.borderColor ? item.borderColor.a : options.borderColor!.a) + ';' +
-                   '--textColorR:' + (item.textColor ? Color.hexToRGB(item.textColor!).r : Color.hexToRGB(options.textColor!).r) + ';' + 
-                   '--textColorG:' + (item.textColor ? Color.hexToRGB(item.textColor!).g : Color.hexToRGB(options.textColor!).g) + ';' +
-                   '--textColorB:' + (item.textColor ? Color.hexToRGB(item.textColor!).b : Color.hexToRGB(options.textColor!).b) + ';' +
-                   '--secondaryFillColorR:' + (item.secondaryFillColor ? item.secondaryFillColor.r : options.secondaryFillColor!.r) + ';' +
-                   '--secondaryFillColorG:' + (item.secondaryFillColor ? item.secondaryFillColor.g : options.secondaryFillColor!.g) + ';' +
-                   '--secondaryFillColorB:' + (item.secondaryFillColor ? item.secondaryFillColor.b : options.secondaryFillColor!.b) + ';' +
-                   '--secondaryFillColorA:' + (item.secondaryFillColor ? item.secondaryFillColor.a : options.secondaryFillColor!.a) + ';' +
-                   '--secondaryBorderColorR:' + (item.secondaryBorderColor ? item.secondaryBorderColor.r : options.secondaryBorderColor!.r) + ';' +
-                   '--secondaryBorderColorG:' + (item.secondaryBorderColor ? item.secondaryBorderColor.g : options.secondaryBorderColor!.g) + ';' +
-                   '--secondaryBorderColorB:' + (item.secondaryBorderColor ? item.secondaryBorderColor.b : options.secondaryBorderColor!.b) + ';' +
-                   '--secondaryBorderColorA:' + (item.secondaryBorderColor ? item.secondaryBorderColor.a : options.secondaryBorderColor!.a) + ';'"
-          [ngStyle]="{'cursor': item.cursor ? item.cursor : options.cursor}">
+                   '--fillColorR:' + (item.selectionFillColor ? item.selectionFillColor.r : options.selectionFillColor!.r) + ';' +
+                   '--fillColorG:' + (item.selectionFillColor ? item.selectionFillColor.g : options.selectionFillColor!.g) + ';' +
+                   '--fillColorB:' + (item.selectionFillColor ? item.selectionFillColor.b : options.selectionFillColor!.b) + ';' +
+                   '--fillColorA:' + (item.selectionFillColor ? item.selectionFillColor.a : options.selectionFillColor!.a) + ';' +
+                   '--borderColorR:' + (item.selectionBorderColor ? item.selectionBorderColor.r : options.selectionBorderColor!.r) + ';' +
+                   '--borderColorG:' + (item.selectionBorderColor ? item.selectionBorderColor.g : options.selectionBorderColor!.g) + ';' +
+                   '--borderColorB:' + (item.selectionBorderColor ? item.selectionBorderColor.b : options.selectionBorderColor!.b) + ';' +
+                   '--borderColorA:' + (item.selectionBorderColor ? item.selectionBorderColor.a : options.selectionBorderColor!.a) + ';' +
+                   '--secondaryFillColorR:' + (item.secondarySelectionFillColor ? item.secondarySelectionFillColor.r : options.secondarySelectionFillColor!.r) + ';' +
+                   '--secondaryFillColorG:' + (item.secondarySelectionFillColor ? item.secondarySelectionFillColor.g : options.secondarySelectionFillColor!.g) + ';' +
+                   '--secondaryFillColorB:' + (item.secondarySelectionFillColor ? item.secondarySelectionFillColor.b : options.secondarySelectionFillColor!.b) + ';' +
+                   '--secondaryFillColorA:' + (item.secondarySelectionFillColor ? item.secondarySelectionFillColor.a : options.secondarySelectionFillColor!.a) + ';' +
+                   '--secondaryBorderColorR:' + (item.secondarySelectionBorderColor ? item.secondarySelectionBorderColor.r : options.secondarySelectionBorderColor!.r) + ';' +
+                   '--secondaryBorderColorG:' + (item.secondarySelectionBorderColor ? item.secondarySelectionBorderColor.g : options.secondarySelectionBorderColor!.g) + ';' +
+                   '--secondaryBorderColorB:' + (item.secondarySelectionBorderColor ? item.secondarySelectionBorderColor.b : options.secondarySelectionBorderColor!.b) + ';' +
+                   '--secondaryBorderColorA:' + (item.secondarySelectionBorderColor ? item.secondarySelectionBorderColor.a : options.secondarySelectionBorderColor!.a) + ';'">
 
-          <div class="indent"
-               [style.width.px]="options.indent! - (options.borderWidth! + 1)">
-          </div>
-     
+
           <div #htmlItemText
                tabindex="-1"
                class="item-text"
-               (mouseup)="getHtmlItemTextSelection()"
-               (mousedown)="getHtmlItemTextSelection()"
-               (keydown.space)="getHtmlItemTextSelection()"
-               (keydown.arrowup)="getHtmlItemTextSelection()"
-               (keydown.arrowdown)="getHtmlItemTextSelection()"
-               (keydown.backspace)="getHtmlItemTextSelection()"
-               (keydown.arrowleft)="getHtmlItemTextSelection()"
-               (keydown.arrowleft)="getHtmlItemTextSelection()"
-               (keydown.arrowRight)="getHtmlItemTextSelection()"
+               (mouseup)="getTextCaretPosition()"
+               (mousedown)="getTextCaretPosition()"
+               (keydown.space)="getTextCaretPosition()"
+               (keydown.arrowup)="getTextCaretPosition()"
+               (keydown.arrowdown)="getTextCaretPosition()"
+               (keydown.backspace)="getTextCaretPosition()"
+               (keydown.arrowleft)="getTextCaretPosition()"
+               (keydown.arrowleft)="getTextCaretPosition()"
+               (keydown.arrowRight)="getTextCaretPosition()"
                [contentEditable]="item == editedItem"
                [style.lineHeight.px]="options.itemHeight! - 2"
                [ngClass]="{'edited-item-text': item == editedItem}"

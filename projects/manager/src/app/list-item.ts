@@ -5,22 +5,23 @@ export class ListItem {
     public id!: string;
     public text!: string;
     public cursor?: string;
+    public textColor?: Color;
     public fontSize?: number;
-    public fillColor?: Color;
     public selected?: boolean;
     public editable?: boolean;
-    public disabled?: boolean;
     public hoverColor?: Color;
-    public textColor?: string;
-    public borderColor?: Color;
+    public deletable?: boolean;
     public fontFamily?: string;
     public caseType?: CaseType;
     public selectable?: boolean;
+    public unselectable?: boolean;
     public showSelection?: boolean;
-    public selectionColor?: string;
-    public secondaryFillColor?: Color;
+    public selectionFillColor?: Color;
     public selectType?: ItemSelectType;
-    public secondaryBorderColor?: Color;
+    public selectionBorderColor?: Color;
+    public selectionBorderWidth?: number;
+    public secondarySelectionFillColor?: Color;
+    public secondarySelectionBorderColor?: Color;
 
     constructor(itemText: string) {
         this.text = itemText;

@@ -14,23 +14,43 @@ import { WebsiteListOptions } from './website-list-options';
 })
 export class AppComponent {
   @ViewChild('list') list!: ListComponent;
-  public testList: Array<ListItem> = new Array<ListItem>();
+  
   private listLength!: number;
 
-  // public listOptions = new ManagerListOptions();
+  public managerListOptions = new ManagerListOptions();
+  public websiteListOptions = new WebsiteListOptions();
+  public managerList: Array<ListItem> = new Array<ListItem>();
+  public websiteList: Array<ListItem> = new Array<ListItem>();
 
-  public listOptions = new WebsiteListOptions();
+
+
+  updateItem() {
+    // this.managerList[4].cursor = 'crosshair';
+    // this.managerList[4].editable = false;
+    // this.managerList[4].fontSize = 20;
+    // this.managerList[4].textColor = new Color(255, 0, 0, 1);
+    // this.managerList[4].deletable = false;
+    // this.managerList[4].selectable = false;
+    // this.managerList[4].fontFamily = 'Segoe Print';
+    // this.managerList[4].hoverColor = new Color(255, 0, 0, 1);
+    // this.managerList[4].unselectable = false;
+    // this.managerList[4].showSelection = false;
+    // this.managerList[4].selectionFillColor = new Color(255, 0, 0, 1);
+    // this.managerList[4].selectionBorderColor = new Color(255, 0, 0, 1);
+    // this.managerList[4].selectionBorderWidth = 3;
+    // this.managerList[4].secondarySelectionFillColor = new Color(255, 0, 0, 1);
+    // this.managerList[4].secondarySelectionBorderColor = new Color(255, 0, 0, 1);
+  }
 
 
 
   onRequestedPageLoad(pageLoad: PageLoad) {
-    this.listLength = this.testList.length;
-    // window.setTimeout(() => {
+    this.listLength = this.managerList.length;
+    
     for (let i = this.listLength; i < this.listLength + pageLoad.itemsPerPage; i++) {
-      this.testList.push({ id: i.toString(), text: 'item' + (i + 1) })
+      this.managerList.push({ id: i.toString(), text: 'item' + (i + 1) });
+      this.websiteList.push({ id: i.toString(), text: 'item' + (i + 1) });
     }
-
-    // }, 1000)
   }
 
 
@@ -96,7 +116,7 @@ export class AppComponent {
   }
 
 
-  onPastedItems(pastedItems: Array<ListItem>) {
-    // console.log(pastedItems)
+  onPastedList(pastedList: Array<ListItem>) {
+    // console.log(pastedList)
   }
 }
