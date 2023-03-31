@@ -4,6 +4,8 @@
      (wheel)="onMouseWheel($event, listContainer)"
      (mousedown)="onListContainerMouseDown($event, listContainer)">
 
+     
+
      <div *ngFor="let item of list"
           #htmlItem
           class="item"
@@ -12,7 +14,7 @@
           [style.height.px]="options.itemHeight"
           (mousedown)="onItemSelect(item, $event)"
           (contextmenu)="$event.preventDefault();"
-          [style.borderWidth.px]="item.selectionBorderWidth ? item.selectionBorderWidth: options.selectionBorderWidth"
+          
           [ngClass]="{'edited-item': item == editedItem,
                       'unselected-item': item == unselectedItem && item.showSelection != false,
                       'primary-selection': item == selectedItem && item.selected && item.showSelection != false,
@@ -23,31 +25,261 @@
                       'disabled-item': editedItem && editedItem != item,
                       'primary-selection-border-only': item == selectedItem && !item.selected && item.showSelection != false}"
           [ngStyle]="{'cursor': item.cursor ? item.cursor : options.cursor}"
-          [style.paddingLeft.px]="options.indent! - (options.selectionBorderWidth! + 1)"
-          [style]="'--textColorR:' + (item.textColor ? item.textColor.r : options.textColor!.r) + ';' + 
+          
+          
+          [style]="
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          item == selectedItem && item.selected && item.showSelection != false ? '
+                         border:
+                              ' + (item.selectionBorderWidth ? item.selectionBorderWidth: options.selectionBorderWidth) + 'px
+                              solid
+                              rgba(' + (item.selectionBorderColor ? item.selectionBorderColor.r : options.selectionBorderColor!.r) + ',
+                                   ' + (item.selectionBorderColor ? item.selectionBorderColor.g : options.selectionBorderColor!.g) + ',
+                                   ' + (item.selectionBorderColor ? item.selectionBorderColor.b : options.selectionBorderColor!.b) + ',
+                                   ' + (item.selectionBorderColor ? item.selectionBorderColor.a : options.selectionBorderColor!.a) + ');
+                         border-top:
+                              visible;
+                         border-bottom:
+                              visible;
+                         background:
+                              rgba(' + (item.selectionFillColor ? item.selectionFillColor.r : options.selectionFillColor!.r) + ',
+                                   ' + (item.selectionFillColor ? item.selectionFillColor.g : options.selectionFillColor!.g) + ',
+                                   ' + (item.selectionFillColor ? item.selectionFillColor.b : options.selectionFillColor!.b) + ',
+                                   ' + (item.selectionFillColor ? item.selectionFillColor.a : options.selectionFillColor!.a) + ');
+                         color:
+                              rgba(' + (item.selectionTextColor ? item.selectionTextColor.r : options.selectionTextColor!.r) + ',
+                                   ' + (item.selectionTextColor ? item.selectionTextColor.g : options.selectionTextColor!.g) + ',
+                                   ' + (item.selectionTextColor ? item.selectionTextColor.b : options.selectionTextColor!.b) + ',
+                                   ' + (item.selectionTextColor ? item.selectionTextColor.a : options.selectionTextColor!.a) + ');
+                         padding-left:
+                              ' + (options.indent! - (options.selectionBorderWidth! + 1)) + 'px'
+                                   
+                                   
+                    :
+                               
+                              
+                    item == selectedItem && !item.selected && item.showSelection != false ? '
+                         border:
+                              ' + (item.selectionBorderWidth ? item.selectionBorderWidth: options.selectionBorderWidth) + 'px
+                              solid
+                              rgba(' + (item.selectionBorderColor ? item.selectionBorderColor.r : options.selectionBorderColor!.r) + ',
+                                   ' + (item.selectionBorderColor ? item.selectionBorderColor.g : options.selectionBorderColor!.g) + ',
+                                   ' + (item.selectionBorderColor ? item.selectionBorderColor.b : options.selectionBorderColor!.b) + ',
+                                   ' + (item.selectionBorderColor ? item.selectionBorderColor.a : options.selectionBorderColor!.a) + ');
+                         border-top:
+                              visible;
+                         border-bottom:
+                              visible;
+                         color:
+                              rgba(' + (item.selectionTextColor ? item.selectionTextColor.r : options.selectionTextColor!.r) + ',
+                                   ' + (item.selectionTextColor ? item.selectionTextColor.g : options.selectionTextColor!.g) + ',
+                                   ' + (item.selectionTextColor ? item.selectionTextColor.b : options.selectionTextColor!.b) + ',
+                                   ' + (item.selectionTextColor ? item.selectionTextColor.a : options.selectionTextColor!.a) + ');
+                         padding-left:
+                              ' + (options.indent! - (options.selectionBorderWidth! + 1)) + 'px'
+
+
+                    :
+                    
+
+                    item == unselectedItem && item.showSelection != false ? '
+                         border:
+                              ' + (item.selectionBorderWidth ? item.selectionBorderWidth: options.selectionBorderWidth) + 'px
+                              solid
+                              rgba(' + (item.selectionBorderColor ? item.selectionBorderColor.r : options.selectionBorderColor!.r) + ',
+                                   ' + (item.selectionBorderColor ? item.selectionBorderColor.g : options.selectionBorderColor!.g) + ',
+                                   ' + (item.selectionBorderColor ? item.selectionBorderColor.b : options.selectionBorderColor!.b) + ',
+                                   ' + (item.selectionBorderColor ? item.selectionBorderColor.a : options.selectionBorderColor!.a) + ');
+                         border-top:
+                              visible;
+                         border-bottom:
+                              visible;
+                         color:
+                              rgba(' + (item.textColor ? item.textColor.r : options.textColor!.r) + ',
+                                   ' + (item.textColor ? item.textColor.g : options.textColor!.g) + ',
+                                   ' + (item.textColor ? item.textColor.b : options.textColor!.b) + ',
+                                   ' + (item.textColor ? item.textColor.a : options.textColor!.a) + ');
+                         padding-left:
+                              ' + (options.indent! - (options.selectionBorderWidth! + 1)) + 'px'
+
+                    :
+                    
+
+
+                    item.selectType == SelectType.All ? '
+                         border:
+                              ' + (item.secondarySelectionBorderWidth ? item.secondarySelectionBorderWidth: options.secondarySelectionBorderWidth) + 'px
+                              solid
+                              rgba(' + (item.secondarySelectionBorderColor ? item.secondarySelectionBorderColor.r : options.secondarySelectionBorderColor!.r) + ',
+                                   ' + (item.secondarySelectionBorderColor ? item.secondarySelectionBorderColor.g : options.secondarySelectionBorderColor!.g) + ',
+                                   ' + (item.secondarySelectionBorderColor ? item.secondarySelectionBorderColor.b : options.secondarySelectionBorderColor!.b) + ',
+                                   ' + (item.secondarySelectionBorderColor ? item.secondarySelectionBorderColor.a : options.secondarySelectionBorderColor!.a) + ');
+                         border-top:
+                              visible;
+                         border-bottom:
+                              visible;
+                         background:
+                              rgba(' + (item.secondarySelectionFillColor ? item.secondarySelectionFillColor.r : options.secondarySelectionFillColor!.r) + ',
+                                   ' + (item.secondarySelectionFillColor ? item.secondarySelectionFillColor.g : options.secondarySelectionFillColor!.g) + ',
+                                   ' + (item.secondarySelectionFillColor ? item.secondarySelectionFillColor.b : options.secondarySelectionFillColor!.b) + ',
+                                   ' + (item.secondarySelectionFillColor ? item.secondarySelectionFillColor.a : options.secondarySelectionFillColor!.a) + ');
+                         color:
+                              rgba(' + (item.secondarySelectionTextColor ? item.secondarySelectionTextColor.r : options.secondarySelectionTextColor!.r) + ',
+                                   ' + (item.secondarySelectionTextColor ? item.secondarySelectionTextColor.g : options.secondarySelectionTextColor!.g) + ',
+                                   ' + (item.secondarySelectionTextColor ? item.secondarySelectionTextColor.b : options.secondarySelectionTextColor!.b) + ',
+                                   ' + (item.secondarySelectionTextColor ? item.secondarySelectionTextColor.a : options.secondarySelectionTextColor!.a) + ');
+                         padding-left:
+                              ' + (options.indent! - (options.secondarySelectionBorderWidth! + 1)) + 'px'
+
+
+                    : 
+                    
+                    
+                    item.selectType == SelectType.Top ? '
+                         border:
+                              ' + (item.secondarySelectionBorderWidth ? item.secondarySelectionBorderWidth: options.secondarySelectionBorderWidth) + 'px
+                              solid
+                              rgba(' + (item.secondarySelectionBorderColor ? item.secondarySelectionBorderColor.r : options.secondarySelectionBorderColor!.r) + ',
+                                   ' + (item.secondarySelectionBorderColor ? item.secondarySelectionBorderColor.g : options.secondarySelectionBorderColor!.g) + ',
+                                   ' + (item.secondarySelectionBorderColor ? item.secondarySelectionBorderColor.b : options.secondarySelectionBorderColor!.b) + ',
+                                   ' + (item.secondarySelectionBorderColor ? item.secondarySelectionBorderColor.a : options.secondarySelectionBorderColor!.a) + ');
+                         border-top:
+                              visible;
+                         border-bottom:
+                              hidden;
+                         background:
+                              rgba(' + (item.secondarySelectionFillColor ? item.secondarySelectionFillColor.r : options.secondarySelectionFillColor!.r) + ',
+                                   ' + (item.secondarySelectionFillColor ? item.secondarySelectionFillColor.g : options.secondarySelectionFillColor!.g) + ',
+                                   ' + (item.secondarySelectionFillColor ? item.secondarySelectionFillColor.b : options.secondarySelectionFillColor!.b) + ',
+                                   ' + (item.secondarySelectionFillColor ? item.secondarySelectionFillColor.a : options.secondarySelectionFillColor!.a) + ');
+                         color:
+                              rgba(' + (item.secondarySelectionTextColor ? item.secondarySelectionTextColor.r : options.secondarySelectionTextColor!.r) + ',
+                                   ' + (item.secondarySelectionTextColor ? item.secondarySelectionTextColor.g : options.secondarySelectionTextColor!.g) + ',
+                                   ' + (item.secondarySelectionTextColor ? item.secondarySelectionTextColor.b : options.secondarySelectionTextColor!.b) + ',
+                                   ' + (item.secondarySelectionTextColor ? item.secondarySelectionTextColor.a : options.secondarySelectionTextColor!.a) + ');
+                         padding-bottom:
+                              ' + (item.secondarySelectionBorderWidth ? item.secondarySelectionBorderWidth: options.secondarySelectionBorderWidth) + 'px;
+                         padding-left:
+                              ' + (options.indent! - (options.secondarySelectionBorderWidth! + 1)) + 'px'
+
+
+
+
+                    :
+                    
+                    
+                    
+                    item.selectType == SelectType.Middle ? '
+                         border:
+                              ' + (item.secondarySelectionBorderWidth ? item.secondarySelectionBorderWidth: options.secondarySelectionBorderWidth) + 'px
+                              solid
+                              rgba(' + (item.secondarySelectionBorderColor ? item.secondarySelectionBorderColor.r : options.secondarySelectionBorderColor!.r) + ',
+                                   ' + (item.secondarySelectionBorderColor ? item.secondarySelectionBorderColor.g : options.secondarySelectionBorderColor!.g) + ',
+                                   ' + (item.secondarySelectionBorderColor ? item.secondarySelectionBorderColor.b : options.secondarySelectionBorderColor!.b) + ',
+                                   ' + (item.secondarySelectionBorderColor ? item.secondarySelectionBorderColor.a : options.secondarySelectionBorderColor!.a) + ');
+                         border-top:
+                              hidden;
+                         border-bottom:
+                              hidden;
+                         background:
+                              rgba(' + (item.secondarySelectionFillColor ? item.secondarySelectionFillColor.r : options.secondarySelectionFillColor!.r) + ',
+                                   ' + (item.secondarySelectionFillColor ? item.secondarySelectionFillColor.g : options.secondarySelectionFillColor!.g) + ',
+                                   ' + (item.secondarySelectionFillColor ? item.secondarySelectionFillColor.b : options.secondarySelectionFillColor!.b) + ',
+                                   ' + (item.secondarySelectionFillColor ? item.secondarySelectionFillColor.a : options.secondarySelectionFillColor!.a) + ');
+                         color:
+                              rgba(' + (item.secondarySelectionTextColor ? item.secondarySelectionTextColor.r : options.secondarySelectionTextColor!.r) + ',
+                                   ' + (item.secondarySelectionTextColor ? item.secondarySelectionTextColor.g : options.secondarySelectionTextColor!.g) + ',
+                                   ' + (item.secondarySelectionTextColor ? item.secondarySelectionTextColor.b : options.secondarySelectionTextColor!.b) + ',
+                                   ' + (item.secondarySelectionTextColor ? item.secondarySelectionTextColor.a : options.secondarySelectionTextColor!.a) + ');
+                         padding-top:
+                              ' + (item.secondarySelectionBorderWidth ? item.secondarySelectionBorderWidth: options.secondarySelectionBorderWidth) + 'px;
+                         padding-bottom:
+                              ' + (item.secondarySelectionBorderWidth ? item.secondarySelectionBorderWidth: options.secondarySelectionBorderWidth) + 'px;
+                         padding-left:
+                              ' + (options.indent! - (options.secondarySelectionBorderWidth! + 1)) + 'px'
+
+
+
+
+                    :
+                    
+                    
+                    
+                    item.selectType == SelectType.Bottom ? '
+                         border:
+                              ' + (item.secondarySelectionBorderWidth ? item.secondarySelectionBorderWidth: options.secondarySelectionBorderWidth) + 'px
+                              solid
+                              rgba(' + (item.secondarySelectionBorderColor ? item.secondarySelectionBorderColor.r : options.secondarySelectionBorderColor!.r) + ',
+                                   ' + (item.secondarySelectionBorderColor ? item.secondarySelectionBorderColor.g : options.secondarySelectionBorderColor!.g) + ',
+                                   ' + (item.secondarySelectionBorderColor ? item.secondarySelectionBorderColor.b : options.secondarySelectionBorderColor!.b) + ',
+                                   ' + (item.secondarySelectionBorderColor ? item.secondarySelectionBorderColor.a : options.secondarySelectionBorderColor!.a) + ');
+                         border-top:
+                              hidden;
+                         border-bottom:
+                              visible;
+                         background:
+                              rgba(' + (item.secondarySelectionFillColor ? item.secondarySelectionFillColor.r : options.secondarySelectionFillColor!.r) + ',
+                                   ' + (item.secondarySelectionFillColor ? item.secondarySelectionFillColor.g : options.secondarySelectionFillColor!.g) + ',
+                                   ' + (item.secondarySelectionFillColor ? item.secondarySelectionFillColor.b : options.secondarySelectionFillColor!.b) + ',
+                                   ' + (item.secondarySelectionFillColor ? item.secondarySelectionFillColor.a : options.secondarySelectionFillColor!.a) + ');
+                         color:
+                              rgba(' + (item.secondarySelectionTextColor ? item.secondarySelectionTextColor.r : options.secondarySelectionTextColor!.r) + ',
+                                   ' + (item.secondarySelectionTextColor ? item.secondarySelectionTextColor.g : options.secondarySelectionTextColor!.g) + ',
+                                   ' + (item.secondarySelectionTextColor ? item.secondarySelectionTextColor.b : options.secondarySelectionTextColor!.b) + ',
+                                   ' + (item.secondarySelectionTextColor ? item.secondarySelectionTextColor.a : options.secondarySelectionTextColor!.a) + ');
+                         padding-top:
+                              ' + (item.secondarySelectionBorderWidth ? item.secondarySelectionBorderWidth: options.secondarySelectionBorderWidth) + 'px;
+                         padding-left:
+                              ' + (options.indent! - (options.secondarySelectionBorderWidth! + 1)) + 'px'
+
+
+
+
+                    :
+
+
+
+                         'border:
+                         ' + (item.selectionBorderWidth ? item.selectionBorderWidth: options.selectionBorderWidth) + 'px
+                         solid
+                         transparent;
+                         
+                         padding-left:
+                              ' + (options.indent! - (options.selectionBorderWidth! + 1)) + 'px;
+                              
+                              
+
+                    --textColorR:' + (item.textColor ? item.textColor.r : options.textColor!.r) + ';' + 
                    '--textColorG:' + (item.textColor ? item.textColor.g : options.textColor!.g) + ';' +
                    '--textColorB:' + (item.textColor ? item.textColor.b : options.textColor!.b) + ';' +
                    '--textColorA:' + (item.textColor ? item.textColor.a : options.textColor!.a) + ';' +
+
+
+                              
                    '--hoverColorR:' + (item.hoverColor ? item.hoverColor.r : options.hoverColor!.r) + ';' +
                    '--hoverColorG:' + (item.hoverColor ? item.hoverColor.g : options.hoverColor!.g) + ';' +
                    '--hoverColorB:' + (item.hoverColor ? item.hoverColor.b : options.hoverColor!.b) + ';' +
                    '--hoverColorA:' + (item.hoverColor ? item.hoverColor.a : options.hoverColor!.a) + ';' +
-                   '--fillColorR:' + (item.selectionFillColor ? item.selectionFillColor.r : options.selectionFillColor!.r) + ';' +
-                   '--fillColorG:' + (item.selectionFillColor ? item.selectionFillColor.g : options.selectionFillColor!.g) + ';' +
-                   '--fillColorB:' + (item.selectionFillColor ? item.selectionFillColor.b : options.selectionFillColor!.b) + ';' +
-                   '--fillColorA:' + (item.selectionFillColor ? item.selectionFillColor.a : options.selectionFillColor!.a) + ';' +
-                   '--borderColorR:' + (item.selectionBorderColor ? item.selectionBorderColor.r : options.selectionBorderColor!.r) + ';' +
-                   '--borderColorG:' + (item.selectionBorderColor ? item.selectionBorderColor.g : options.selectionBorderColor!.g) + ';' +
-                   '--borderColorB:' + (item.selectionBorderColor ? item.selectionBorderColor.b : options.selectionBorderColor!.b) + ';' +
-                   '--borderColorA:' + (item.selectionBorderColor ? item.selectionBorderColor.a : options.selectionBorderColor!.a) + ';' +
-                   '--secondaryFillColorR:' + (item.secondarySelectionFillColor ? item.secondarySelectionFillColor.r : options.secondarySelectionFillColor!.r) + ';' +
-                   '--secondaryFillColorG:' + (item.secondarySelectionFillColor ? item.secondarySelectionFillColor.g : options.secondarySelectionFillColor!.g) + ';' +
-                   '--secondaryFillColorB:' + (item.secondarySelectionFillColor ? item.secondarySelectionFillColor.b : options.secondarySelectionFillColor!.b) + ';' +
-                   '--secondaryFillColorA:' + (item.secondarySelectionFillColor ? item.secondarySelectionFillColor.a : options.secondarySelectionFillColor!.a) + ';' +
-                   '--secondaryBorderColorR:' + (item.secondarySelectionBorderColor ? item.secondarySelectionBorderColor.r : options.secondarySelectionBorderColor!.r) + ';' +
-                   '--secondaryBorderColorG:' + (item.secondarySelectionBorderColor ? item.secondarySelectionBorderColor.g : options.secondarySelectionBorderColor!.g) + ';' +
-                   '--secondaryBorderColorB:' + (item.secondarySelectionBorderColor ? item.secondarySelectionBorderColor.b : options.secondarySelectionBorderColor!.b) + ';' +
-                   '--secondaryBorderColorA:' + (item.secondarySelectionBorderColor ? item.secondarySelectionBorderColor.a : options.secondarySelectionBorderColor!.a) + ';'">
+
+                   '--hoverTextColorR:' + (item.hoverTextColor ? item.hoverTextColor.r : options.hoverTextColor!.r) + ';' +
+                   '--hoverTextColorG:' + (item.hoverTextColor ? item.hoverTextColor.g : options.hoverTextColor!.g) + ';' +
+                   '--hoverTextColorB:' + (item.hoverTextColor ? item.hoverTextColor.b : options.hoverTextColor!.b) + ';' +
+                   '--hoverTextColorA:' + (item.hoverTextColor ? item.hoverTextColor.a : options.hoverTextColor!.a) + ';' 
+
+
+                   
+                              
+                              
+                              ">
 
 
           <div #htmlItemText
@@ -66,7 +298,13 @@
                [style.lineHeight.px]="options.itemHeight! - 2"
                [ngClass]="{'edited-item-text': item == editedItem}"
                [style.fontSize.px]="item.fontSize ? item.fontSize : options.fontSize"
-               [style.fontFamily]="item.fontFamily ? item.fontFamily : options.fontFamily">
+               [style.fontFamily]="item.fontFamily ? item.fontFamily : options.fontFamily"
+               [style]="item == editedItem ?
+                    'border-color:
+                         rgba(' + (item.secondarySelectionBorderColor ? item.secondarySelectionBorderColor.r : options.secondarySelectionBorderColor!.r) + ',
+                              ' + (item.secondarySelectionBorderColor ? item.secondarySelectionBorderColor.g : options.secondarySelectionBorderColor!.g) + ',
+                              ' + (item.secondarySelectionBorderColor ? item.secondarySelectionBorderColor.b : options.secondarySelectionBorderColor!.b) + ',
+                              ' + (item.secondarySelectionBorderColor ? item.secondarySelectionBorderColor.a : options.secondarySelectionBorderColor!.a) + ');' : null ">
                {{item.text}}
           </div>
      </div>

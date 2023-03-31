@@ -11,14 +11,15 @@
     outline: none;
     user-select: none;
     align-items: center;
-    border: solid transparent;
+    // border: solid transparent;
     color: rgb(var(--textColorR), var(--textColorG), var(--textColorB), var(--textColorA));
 
     &:hover:not(.edited-item):not(.unselected-item):not(.primary-selection):not(.secondary-selection-all):not(.secondary-selection-top):not(.secondary-selection-middle):not(.secondary-selection-bottom):not(.primary-selection-border):not(.disabled-item) {
         background: rgba(var(--hoverColorR), var(--hoverColorG), var(--hoverColorB), var(--hoverColorA));
-        color: rgb(calc(var(--textColorR) + 50), calc(var(--textColorG) + 50), calc(var(--textColorB) + 50), var(--textColorA));
+        color: rgba(var(--hoverTextColorR), var(--hoverTextColorG), var(--hoverTextColorB), var(--hoverTextColorA));
     }
 }
+
 
 
 
@@ -27,7 +28,6 @@
     border-right: none;
     background: #202020;
     border-color: transparent;
-    color: rgb(calc(var(--textColorR) + 61), calc(var(--textColorG) + 61), calc(var(--textColorB) + 61), var(--textColorA));
 }
 
 
@@ -121,5 +121,4 @@
 
 .edited-item-text {
     background: #2b2b2b;
-    border-color: rgba(var(--secondaryBorderColorR), var(--secondaryBorderColorG), var(--secondaryBorderColorB), var(--secondaryBorderColorA));
 }
