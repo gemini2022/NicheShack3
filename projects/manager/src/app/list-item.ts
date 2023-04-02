@@ -20,6 +20,7 @@ export class ListItem {
     public selectionFillColor?: Color;
     public selectionTextColor?: Color;
     public selectType?: ItemSelectType;
+    public editedItemTextColor?: Color;
     public selectionBorderColor?: Color;
     public selectionBorderWidth?: number;
     public secondarySelectionTextColor?: Color;

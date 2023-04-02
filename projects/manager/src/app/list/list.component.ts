@@ -26,7 +26,6 @@ export class ListComponent {
   private stopMouseDownPropagation!: boolean;
 
   // Public
-  public Color = Color;
   public SelectType = ItemSelectType;
   public get editedItem(): ListItem { return this._editedItem; }
   public get selectedItem(): ListItem { return this._selectedItem; }

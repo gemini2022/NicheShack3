@@ -18,18 +18,22 @@ export class ListOptions {
     public multiselectable?: boolean = true;
     public selectionBorderWidth?: number = 1;
     public noSelectOnArrowKey?: boolean = true;
-    public secondarySelectionBorderWidth?: number = 1;
+    public secondarySelectionBorderWidth?: number = 3;
     public initiateSelectionOnArrowKey?: boolean = false;
     public textColor?: Color = new Color(160, 160, 160, 1);
     public hoverColor?: Color = new Color(255, 255, 255, 0.03);
     public fontFamily?: string = 'Arial, Helvetica, sans-serif';
     public hoverTextColor?: Color = new Color(210, 210, 210, 1);
     public selectionTextColor?: Color = new Color(255, 255, 255, 1);
+    public editedItemTextColor?: Color = new Color(220, 220, 220, 1);
     public selectionFillColor?: Color = new Color(255, 255, 255, 0.1);
     public selectionBorderColor?: Color = new Color(255, 255, 255, 0.85);
-    public secondarySelectionTextColor?: Color = new Color(206, 206, 206, 1);
+    public secondarySelectionTextColor?: Color = new Color(210, 210, 210, 1);
     public secondarySelectionFillColor?: Color = new Color(255, 255, 255, 0.05);
     public secondarySelectionBorderColor?: Color = new Color(255, 255, 255, 0.25);
+
+
+    
 
     
     
@@ -57,6 +61,7 @@ export class ListOptions {
             if (listOptions.multiselectable != null) this.multiselectable = listOptions.multiselectable;
             if (listOptions.selectionFillColor) this.selectionFillColor = listOptions.selectionFillColor;
             if (listOptions.selectionTextColor) this.selectionTextColor = listOptions.selectionTextColor;
+            if (listOptions.editedItemTextColor) this.editedItemTextColor = listOptions.editedItemTextColor;
             if (listOptions.selectionBorderColor) this.selectionBorderColor = listOptions.selectionBorderColor;
             if (listOptions.noSelectOnArrowKey != null) this.noSelectOnArrowKey = listOptions.noSelectOnArrowKey;
             if (listOptions.selectionBorderWidth != null) this.selectionBorderWidth = listOptions.selectionBorderWidth;
