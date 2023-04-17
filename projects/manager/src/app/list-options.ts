@@ -17,9 +17,8 @@ export class ListOptions {
     public scrollSnapping?: boolean = false;
     public multiselectable?: boolean = true;
     public selectionBorderWidth?: number = 1;
-    public noSelectOnArrowKey?: boolean = true;
-    public secondarySelectionBorderWidth?: number = 3;
-    public initiateSelectionOnArrowKey?: boolean = false;
+    public noSelectOnArrowKey?: boolean = false;
+    public secondarySelectionBorderWidth?: number = 1;
     public textColor?: Color = new Color(160, 160, 160, 1);
     public hoverColor?: Color = new Color(255, 255, 255, 0.03);
     public fontFamily?: string = 'Arial, Helvetica, sans-serif';
@@ -31,11 +30,6 @@ export class ListOptions {
     public secondarySelectionTextColor?: Color = new Color(210, 210, 210, 1);
     public secondarySelectionFillColor?: Color = new Color(255, 255, 255, 0.05);
     public secondarySelectionBorderColor?: Color = new Color(255, 255, 255, 0.25);
-
-
-    
-
-    
     
 
     constructor(listOptions?: ListOptions) {
@@ -68,7 +62,6 @@ export class ListOptions {
             if (listOptions.secondarySelectionTextColor) this.secondarySelectionTextColor = listOptions.secondarySelectionTextColor;
             if (listOptions.secondarySelectionFillColor) this.secondarySelectionFillColor = listOptions.secondarySelectionFillColor;
             if (listOptions.secondarySelectionBorderColor) this.secondarySelectionBorderColor = listOptions.secondarySelectionBorderColor;
-            if (listOptions.initiateSelectionOnArrowKey != null) this.initiateSelectionOnArrowKey = listOptions.initiateSelectionOnArrowKey;
             if (listOptions.secondarySelectionBorderWidth != null) this.secondarySelectionBorderWidth = listOptions.secondarySelectionBorderWidth;
         }
     }

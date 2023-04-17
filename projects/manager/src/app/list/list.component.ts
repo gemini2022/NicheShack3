@@ -1,4 +1,3 @@
-import { Color } from '../color';
 import { ListItem } from '../list-item';
 import { PageLoad } from '../page-load';
 import { ListOptions } from '../list-options';
@@ -19,6 +18,7 @@ export class ListComponent {
   private _editedItem!: ListItem;
   private _selectedItem!: ListItem;
   private _unselectedItem!: ListItem;
+  private _itemSelectType = ItemSelectType;
   private textCaretPosition!: Selection;
   private eventListenersAdded!: boolean;
   private loadedPages: Array<number> = [0];
@@ -26,7 +26,7 @@ export class ListComponent {
   private stopMouseDownPropagation!: boolean;
 
   // Public
-  public SelectType = ItemSelectType;
+  public get ItemSelectType(): typeof ItemSelectType { return this._itemSelectType; }
   public get editedItem(): ListItem { return this._editedItem; }
   public get selectedItem(): ListItem { return this._selectedItem; }
   public get unselectedItem(): ListItem { return this._unselectedItem; }
@@ -39,6 +39,7 @@ export class ListComponent {
   @Output() public addedItemEvent: EventEmitter<ListItem> = new EventEmitter();
   @Output() public editedItemEvent: EventEmitter<ListItem> = new EventEmitter();
   @Output() public unselectedListEvent: EventEmitter<void> = new EventEmitter();
+  @Output() public pressedEscapeKeyEvent: EventEmitter<void> = new EventEmitter();
   @Output() public pressedEnterKeyEvent: EventEmitter<ListItem> = new EventEmitter();
   @Output() public rightClickedItemEvent: EventEmitter<ListItem> = new EventEmitter();
   @Output() public requestedPageLoadEvent: EventEmitter<PageLoad> = new EventEmitter();
@@ -56,17 +57,15 @@ export class ListComponent {
 
 
 
-  private ngOnChanges(changes: SimpleChanges) {
+  private ngOnChanges(changes: SimpleChanges): void {
     // If any of the default options have been changed
     if (changes.options) this.options = new ListOptions(changes.options.currentValue);
   }
 
 
 
-  private ngOnInit() {
+  private ngOnInit(): void {
     if (this.options.loadListOnInit) this.LoadPage(1);
-    // If initiateSelectionOnArrowKey is enabled, start listening for the arrow keys right away
-    if (this.options.initiateSelectionOnArrowKey) window.addEventListener('keydown', this.onKeyDown);
   }
 
 
@@ -78,25 +77,31 @@ export class ListComponent {
 
 
 
-  public onItemSelect(item: ListItem, e?: MouseEvent): void {
+  public onItemSelect(item: ListItem, mouseEvent: MouseEvent): void {
+    const rightButton = 2;
     this.stopMouseDownPropagation = true;
+
 
     // As long as the item that just received this mouse down is (NOT) currently being edited
     if (this._editedItem != item) {
 
       // If another item is being edited, remove it from edit mode
-      if (this._editedItem) this.exitItemEdit(null!, true);
+      if (this._editedItem) this.exitItemEdit(undefined, true);
 
-      // If this item is being selected from a right mouse down
-      if (e && e.button == 2) {
-        this.rightClickedItemEvent.emit(item);
-      }
 
-      // As long as the list is selectable and the item itself is selectable
-      if (this.options.selectable && item.selectable != false) {
+      // As long as the list (IS) selectable and the item itself (IS) selectable
+      if ((this.options.selectable && item.selectable != false) ||
+        // Or if the list is (NOT) selectable but the item itself (IS) selectable
+        (!this.options.selectable && item.selectable)) {
 
-        // As long as we're (NOT) right clicking on an item that's already selected
-        if (!(e != null && e.button == 2 && item.selected)) {
+
+        // If this item is being selected from a right mouse down
+        if (mouseEvent.button == rightButton) {
+          this.rightClickedItemEvent.emit(item);
+        }
+
+        // And as long as we're (NOT) right clicking on an item that's already selected
+        if (!(mouseEvent.button == rightButton && item.selected)) {
 
           // Set the selection for the item
           this.setItemSelection(item);
@@ -142,7 +147,7 @@ export class ListComponent {
       this.setSelectedItemsNoModifierKey();
     }
 
-    // Now define what the selection type is for each item
+    // Now define what the secondary selection type is for each item (if any)
     this.setSecondarySelectionType();
   }
 
@@ -150,7 +155,7 @@ export class ListComponent {
 
 
   private setSelectedItemsShiftKey(): void {
-    let selectedItems: Array<ListItem> = new Array<ListItem>();
+    const selectedItems: Array<ListItem> = new Array<ListItem>();
 
     // Clear the selection for all items
     this.list.forEach(x => {
@@ -170,7 +175,11 @@ export class ListComponent {
       // Select all the items from the pivot down to the selection
       for (let i = indexOfPivotItem; i <= indexOfSelectedItem; i++) {
         if (this.list[i].selectable != false) selectedItems.push(this.list[i]);
-        if (this.list[i].selectable != false && this.list[i].showSelection != false) this.list[i].selected = true;
+
+        if (this.list[i].selectable != false && ((this.options.showSelection && this.list[i].showSelection != false) ||
+          (!this.options.showSelection && this.list[i].showSelection))) {
+          this.list[i].selected = true;
+        }
       }
 
       // If the selection is before the pivot 
@@ -179,7 +188,11 @@ export class ListComponent {
       // Select all the items from the pivot up to the selection
       for (let i = indexOfPivotItem; i >= indexOfSelectedItem; i--) {
         if (this.list[i].selectable != false) selectedItems.push(this.list[i]);
-        if (this.list[i].selectable != false && this.list[i].showSelection != false) this.list[i].selected = true;
+
+        if (this.list[i].selectable != false && ((this.options.showSelection && this.list[i].showSelection != false) ||
+          (!this.options.showSelection && this.list[i].showSelection))) {
+          this.list[i].selected = true;
+        }
       }
     }
     this.selectedItemsEvent.emit(selectedItems);
@@ -192,8 +205,11 @@ export class ListComponent {
     // If the item we are pressing down on is already selected
     if (this._selectedItem.selected) {
 
-      // As long as the list is unselectable and the item itself is unselectable 
-      if (this.options.unselectable && this._selectedItem.unselectable != false) {
+      // As long as the list (IS) unselectable and the item itself (IS) unselectable
+      if ((this.options.unselectable && this._selectedItem.unselectable != false) ||
+        // Or if the list is (NOT) unselectable but the item itself (IS) unselectable
+        (!this.options.unselectable && this._selectedItem.unselectable)) {
+
         // Set that item as unselected
         this._selectedItem.selected = false;
         this._selectedItem.selectType = null!;
@@ -207,7 +223,14 @@ export class ListComponent {
 
       // Select that item
       this._unselectedItem = null!;
-      if (this._selectedItem.showSelection != false) this._selectedItem.selected = true;
+
+      // As long as the list (IS) allowed to show the selection and the item itself (IS) allowed to show its selection
+      if ((this.options.showSelection && this._selectedItem.showSelection != false) ||
+        // Or if the list is (NOT) allowed to show the selection but the item itself (IS) allowed to show its selection
+        (!this.options.showSelection && this._selectedItem.showSelection)) {
+        this._selectedItem.selected = true;
+      }
+
       this.pivotItem = this._selectedItem;
       this.selectedItemsEvent.emit([this._selectedItem]);
     }
@@ -247,11 +270,9 @@ export class ListComponent {
         // Item after (IS) selected or item after (IS) unselected
         if (this.list[1].selected || this.list[1] == this._unselectedItem) {
           this.list[0].selectType = ItemSelectType.Top;
-        }
 
-
-        // Item after (NOT) selected and item after (NOT) unselected
-        if (!this.list[1].selected && this.list[1] != this._unselectedItem) {
+          // Item after (NOT) selected and item after (NOT) unselected
+        } else if (!this.list[1].selected && this.list[1] != this._unselectedItem) {
           this.list[0].selectType = ItemSelectType.All;
         }
       }
@@ -348,11 +369,9 @@ export class ListComponent {
         // Item before (IS) selected or item before (IS) unselected
         if (this.list[this.list.length - 2].selected || this.list[this.list.length - 2] == this._unselectedItem) {
           this.list[this.list.length - 1].selectType = ItemSelectType.Bottom;
-        }
 
-
-        // Item before (NOT) selected and item before (NOT) unselected
-        if (!this.list[this.list.length - 2].selected && this.list[this.list.length - 2] != this._unselectedItem) {
+          // Item before (NOT) selected and item before (NOT) unselected
+        } else if (!this.list[this.list.length - 2].selected && this.list[this.list.length - 2] != this._unselectedItem) {
           this.list[this.list.length - 1].selectType = ItemSelectType.All;
         }
       }
@@ -368,8 +387,7 @@ export class ListComponent {
       window.addEventListener('keyup', this.onKeyUp);
       window.addEventListener('paste', this.onPaste);
       window.addEventListener('mousedown', this.onMouseDown);
-      // If initiateSelectionOnArrowKey is enabled, then don't turn this listener on because it would of already been turned on during ngOnInit
-      if (!this.options.initiateSelectionOnArrowKey) window.addEventListener('keydown', this.onKeyDown);
+      window.addEventListener('keydown', this.onKeyDown);
     }
   }
 
@@ -391,7 +409,7 @@ export class ListComponent {
         this.reinitializeList();
       }
 
-      // If a mouse-down on an item did just occur
+      // If a mouse-down on an item (DID) just occur
     } else {
       this.stopMouseDownPropagation = false;
     }
@@ -400,7 +418,7 @@ export class ListComponent {
 
 
 
-  public onListContainerMouseDown(e: MouseEvent, listContainer: HTMLElement) {
+  public onListContainerMouseDown(e: MouseEvent, listContainer: HTMLElement): void {
     if (e.clientX > listContainer.clientWidth) {
       this.stopMouseDownPropagation = true;
     }
@@ -410,35 +428,30 @@ export class ListComponent {
 
 
   private onKeyDown = (e: KeyboardEvent): void => {
-    // If initiateSelectionOnArrowKey is enabled, we don't want these keys to be listening until an item gets selected
-    if (this.eventListenersAdded) {
-      if (e.key === 'Enter') {
-        this.onEnter(e);
-        return
-      }
-      if (e.key === 'Escape') {
-        this.onEscape();
-        return
-      }
-
-      if (e.key === 'Delete') {
-        this.emitPressedDeleteKey();
-        return
-      }
-
-      if (this.options.multiselectable) {
-        if (e.key === 'Shift') {
-          this.shiftKeyDown = true;
-          return
-        }
-        if (e.key === 'Control') {
-          this.ctrlKeyDown = true;
-          return
-        }
-      }
+    if (e.key === 'Enter') {
+      this.onEnter(e);
+      return
+    }
+    if (e.key === 'Escape') {
+      this.onEscape();
+      return
     }
 
+    if (e.key === 'Delete') {
+      this.emitPressedDeleteKey();
+      return
+    }
 
+    if (this.options.multiselectable) {
+      if (e.key === 'Shift') {
+        this.shiftKeyDown = true;
+        return
+      }
+      if (e.key === 'Control') {
+        this.ctrlKeyDown = true;
+        return
+      }
+    }
 
     if (e.key === 'ArrowUp') {
       this.onArrowUp(e);
@@ -465,9 +478,6 @@ export class ListComponent {
       }
     }
   }
-
-
-
 
 
 
@@ -523,16 +533,14 @@ export class ListComponent {
 
 
   public onItemDoubleClick(): void {
-    // As long as an item is (NOT) being edited and the [shift] key and the [CTRL] key is (NOT) being pressed
-    if (!this._editedItem && !this.shiftKeyDown && !this.ctrlKeyDown) {
+    // As long as an item is (NOT) already being edited
+    if (!this._editedItem &&
+      // And as long as the list (IS) editable and the item itself (IS) editable
+      ((this.options.editable && (this._selectedItem && this._selectedItem.editable != false)) ||
+        // Or if the list is (NOT) editable but the item itself (IS) editable
+        (!this.options.editable && (this._selectedItem && this._selectedItem.editable)))) {
 
-      // As long as an item is selected (it is possible the item that's getting double-clicked is (NOT) selectable)
-      if (this._selectedItem) {
-        // And as long as the item itself is editable
-        if (this._selectedItem.editable != false) {
-          this.editItem();
-        }
-      }
+      this.editItem();
     }
   }
 
@@ -602,7 +610,7 @@ export class ListComponent {
 
 
 
-  private cancelItemEdit() {
+  private cancelItemEdit(): void {
     // If we're adding a new item 
     if (this.isNewItem) {
 
@@ -623,7 +631,11 @@ export class ListComponent {
 
   private reselectItem(item: ListItem): void {
     this.isNewItem = false;
-    if (this.options.selectable && item.selectable != false) {
+
+    // As long as the list (IS) selectable and the item itself (IS) selectable
+    if ((this.options.selectable && item.selectable != false) ||
+      // Or if the list is (NOT) selectable but the item itself (IS) selectable
+      (!this.options.selectable && item.selectable)) {
       this._selectedItem = item;
       this._selectedItem.selected = true;
       this.getHtmlItem(this._selectedItem)!.focus();
@@ -636,7 +648,7 @@ export class ListComponent {
 
 
 
-  private completeItemEdit() {
+  private completeItemEdit(): void {
     const oldText = this._editedItem.text;
     this._editedItem.text = this.getCaseType(this._editedItem);
     this.getHtmlItemText(this._editedItem).innerText = this.getHtmlItemText(this._editedItem).innerText.trim();
@@ -696,14 +708,45 @@ export class ListComponent {
 
 
 
+  private getDeletedItems(): Array<ListItem> {
+    let itemsToBeDeleted: ListItem[] = [];
+    const selectedItems = this.list.filter(x => x.selected);
+
+    selectedItems.forEach(x => {
+      // If the list (IS) deletable and the item itself (IS) deletable
+      if ((this.options.deletable && x.deletable != false) ||
+        // Or if the list is (NOT) deletable but the item itself (IS) deletable
+        (!this.options.deletable && x.deletable)) {
+        itemsToBeDeleted.push(x);
+      }
+    })
+    return itemsToBeDeleted;
+  }
 
 
-  public deleteItem() {
-    if (this.options.deletable) {
-      const deletedItems = this.list.filter(x => x.selected && x.deletable != false);
 
-      if (deletedItems.length > 0) {
-        this.deletedItemsEvent.emit(deletedItems);
+  private emitPressedDeleteKey(): void {
+    // As long as an item is (NOT) being edited
+    if (!this._editedItem) {
+      const itemsToBeDeleted = this.getDeletedItems();
+
+      // As long as there is items to be deleted
+      if (itemsToBeDeleted.length > 0) {
+        this.pressedDeleteKeyEvent.emit(itemsToBeDeleted);
+      }
+    }
+  }
+
+
+
+
+  public deleteItem(deletedItems?: Array<ListItem>): void {
+    // As long as an item is (NOT) being edited
+    if (!this._editedItem) {
+      const itemsToBeDeleted = deletedItems ? deletedItems : this.getDeletedItems();
+
+      if (itemsToBeDeleted.length > 0) {
+        this.deletedItemsEvent.emit(itemsToBeDeleted);
         const nextSelectedItem = this.getNextSelectedItemAfterDelete();
 
         // Filter the list of the items that are (NOT) being deleted
@@ -711,8 +754,8 @@ export class ListComponent {
           let keepInList: boolean = true;
 
           // If an item is a deleted item then do (NOT) keep it in the list
-          for (let i = 0; i < deletedItems.length; i++) {
-            if (x == deletedItems[i]) {
+          for (let i = 0; i < itemsToBeDeleted.length; i++) {
+            if (x == itemsToBeDeleted[i]) {
               keepInList = false;
               break;
             }
@@ -721,7 +764,19 @@ export class ListComponent {
         });
 
         if (nextSelectedItem) {
-          this.reselectItem(nextSelectedItem);
+
+          // If the list is set to have the items get selected on arrow key navigation
+          if (!this.options.noSelectOnArrowKey) {
+            // Select the next item in the list
+            this.setItemSelection(nextSelectedItem);
+
+            // But if the list is set to (NOT) have the items get selected on arrow key navigation
+          } else {
+            this._unselectedItem = null!;
+            this._selectedItem = nextSelectedItem;
+            this.setSecondarySelectionType();
+            this.getHtmlItem(this._selectedItem)!.focus();
+          }
 
         } else {
 
@@ -758,15 +813,7 @@ export class ListComponent {
 
 
 
-  private emitPressedDeleteKey() {
-    if (!this._editedItem && this.options.deletable) {
-      const itemsToBeDeleted = this.list.filter(x => x.selected && x.deletable != false);
 
-      if (itemsToBeDeleted.length > 0) {
-        this.pressedDeleteKeyEvent.emit(itemsToBeDeleted);
-      }
-    }
-  }
 
 
 
@@ -797,6 +844,7 @@ export class ListComponent {
     } else {
       this.reinitializeList();
     }
+    this.pressedEscapeKeyEvent.emit();
   }
 
 
@@ -903,7 +951,7 @@ export class ListComponent {
 
 
 
-  public onMouseWheel(e: WheelEvent, listContainer: HTMLElement) {
+  public onMouseWheel(e: WheelEvent, listContainer: HTMLElement): void {
     if (this.options.scrollSnapping) {
       e.preventDefault();
 
@@ -914,7 +962,7 @@ export class ListComponent {
 
 
 
-  public onScroll(listContainer: HTMLElement) {
+  public onScroll(listContainer: HTMLElement): void {
     const scrollPosition = listContainer.scrollTop + listContainer.clientHeight;
     const scrollDirection = Math.max(-1, Math.min(1, (listContainer.scrollTop - this.lastScrollTopPosition)));
 
@@ -987,7 +1035,7 @@ export class ListComponent {
 
 
 
-  private pasteClipboardDataList(clipboardDataList: Array<string>) {
+  private pasteClipboardDataList(clipboardDataList: Array<string>): void {
     const index = this.list.indexOf(this._editedItem);
     this._editedItem = null!;
 
@@ -1036,7 +1084,7 @@ export class ListComponent {
 
 
 
-  private pasteClipboardData(clipboardData: string) {
+  private pasteClipboardData(clipboardData: string): void {
     const sel = window.getSelection();
     const range = document.createRange();
     const textBeforeCaret = this.getHtmlItemText(this._editedItem).innerText.substring(0, this.textCaretPosition.anchorOffset);
@@ -1053,9 +1101,9 @@ export class ListComponent {
 
 
 
-  private getHtmlItem(item: ListItem) {
+  private getHtmlItem(item: ListItem): HTMLElement {
     const index = this.list.indexOf(item);
-    return this.htmlItems.get(index)?.nativeElement;
+    return this.htmlItems.get(index)?.nativeElement!;
   }
 
 
@@ -1066,7 +1114,7 @@ export class ListComponent {
   }
 
 
-  public getTextCaretPosition() {
+  public getTextCaretPosition(): void {
     if (this._editedItem) {
       window.setTimeout(() => {
         this.textCaretPosition = window.getSelection()!;
@@ -1090,26 +1138,80 @@ export class ListComponent {
     this.isNewItem = false;
     this._editedItem = null!;
 
+    // If the list is unselectable
     if (this.options.unselectable) {
-      this.pivotItem = null!;
+      let itemsNotToBeUnselected!: boolean;
       this.ctrlKeyDown = false;
       this.shiftKeyDown = false;
       this._unselectedItem = null!;
       this.eventListenersAdded = false;
+      // If an item is marked as the pivot item and as long as it is unselectable, remove it from being the pivot item
+      if (this.pivotItem && this.pivotItem.unselectable != false) this.pivotItem = null!;
+      // If an item is marked as the selected item and as long as it is unselectable, remove it from being the selected item
       if (this._selectedItem && this._selectedItem.unselectable != false) this._selectedItem = null!;
 
+      // Loop through each item of the list
       this.list.forEach(x => {
+        // If the item can be unselected
         if (x.unselectable != false) {
           x.selected = false;
           x.selectType = null!;
+
+          // But if the item can (NOT) be unselected and it's currently selected
+        } else {
+          if (x.selected) itemsNotToBeUnselected = true;
         }
       });
 
-      this.unselectedListEvent.emit();
-      window.removeEventListener('keyup', this.onKeyUp);
-      window.removeEventListener('paste', this.onPaste);
-      window.removeEventListener('mousedown', this.onMouseDown);
-      if (!this.options.initiateSelectionOnArrowKey) window.removeEventListener('keydown', this.onKeyDown);
+      // As long as (NO) item is selected that can't be unselected
+      if (!itemsNotToBeUnselected) {
+        // Remove all the listeners
+        this.removeEventListeners();
+
+        // But if there is an item that is selected that can't be unselected
+      } else {
+        this.setSecondarySelectionType();
+      }
+
+      // If the list is (NOT) unselectable
+    } else {
+      let itemsToBeUnselected!: boolean;
+
+      // Loop through each item of the list
+      this.list.forEach(x => {
+        // If there is an item that is selected that is unselectable
+        if (x.selected && x.unselectable) {
+          // Unselect it
+          x.selected = false;
+          x.selectType = null!;
+          itemsToBeUnselected = true;
+          if (x == this.pivotItem) this.pivotItem = null!;
+          if (x == this._selectedItem) this._selectedItem = null!;
+        }
+      });
+
+      if (itemsToBeUnselected) {
+        this.setSecondarySelectionType();
+      }
+
+      // Check to see if any itmes are selected
+      const selectedItems = this.list.filter(x => x.selected);
+
+      // If the list ends up having no items selected
+      if (selectedItems.length == 0) {
+        // Remove all the listeners
+        this.removeEventListeners();
+      }
     }
+  }
+
+
+
+  private removeEventListeners(): void {
+    this.unselectedListEvent.emit();
+    window.removeEventListener('keyup', this.onKeyUp);
+    window.removeEventListener('paste', this.onPaste);
+    window.removeEventListener('mousedown', this.onMouseDown);
+    window.removeEventListener('keydown', this.onKeyDown);
   }
 }

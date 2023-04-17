@@ -13,7 +13,7 @@
     align-items: center;
     color: var(--textColor);
     padding-left: var(--indent);
-    border: var(--borderWidth) solid transparent;
+    border: var(--selectionBorderWidth) solid transparent;
 
     &:hover:not(.edited-item):not(.unselected-item):not(.primary-selection):not(.secondary-selection-all):not(.secondary-selection-top):not(.secondary-selection-middle):not(.secondary-selection-bottom):not(.primary-selection-border):not(.disabled-item) {
         color: var(--hoverTextColor);
@@ -58,10 +58,10 @@
     border-bottom: hidden;
     padding-left: var(--secondaryIndent);
     color: var(--secondarySelectionTextColor);
-    border-width: var(--secondaryBorderWidth);
-    padding-bottom: var(--secondaryBorderWidth);
     background: var(--secondarySelectionFillColor);
     border-color: var(--secondarySelectionBorderColor);
+    border-width: var(--secondarySelectionBorderWidth);
+    padding-bottom: var(--secondarySelectionBorderWidth);
 }
 
 
@@ -70,12 +70,12 @@
     border-top: hidden;
     border-bottom: hidden;
     padding-left: var(--secondaryIndent);
-    padding-top: var(--secondaryBorderWidth);
     color: var(--secondarySelectionTextColor);
-    border-width: var(--secondaryBorderWidth);
-    padding-bottom: var(--secondaryBorderWidth);
     background: var(--secondarySelectionFillColor);
+    padding-top: var(--secondarySelectionBorderWidth);
     border-color: var(--secondarySelectionBorderColor);
+    border-width: var(--secondarySelectionBorderWidth);
+    padding-bottom: var(--secondarySelectionBorderWidth);
 }
 
 
@@ -83,10 +83,10 @@
 .secondary-selection-bottom:not(.primary-selection) {
     border-top: hidden;
     padding-left: var(--secondaryIndent);
-    padding-top: var(--secondaryBorderWidth);
     color: var(--secondarySelectionTextColor);
-    border-width: var(--secondaryBorderWidth);
     background: var(--secondarySelectionFillColor);
+    padding-top: var(--secondarySelectionBorderWidth);
+    border-width: var(--secondarySelectionBorderWidth);
     border-color: var(--secondarySelectionBorderColor);
 }
 

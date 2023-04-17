@@ -14,24 +14,24 @@
           (contextmenu)="$event.preventDefault();"
           [ngClass]="{'edited-item': item == editedItem,
                       'disabled-item': editedItem && editedItem != item,
-                      'secondary-selection-all': item.selectType == SelectType.All,
-                      'secondary-selection-top': item.selectType == SelectType.Top,
-                      'secondary-selection-middle': item.selectType == SelectType.Middle,
-                      'secondary-selection-bottom': item.selectType == SelectType.Bottom,
-                      'unselected-item': item == unselectedItem && item.showSelection != false,
-                      'primary-selection': item == selectedItem && item.selected && item.showSelection != false,
-                      'primary-selection-border-only': item == selectedItem && !item.selected && item.showSelection != false}"
+                      'secondary-selection-all': item.selectType == ItemSelectType.All,
+                      'secondary-selection-top': item.selectType == ItemSelectType.Top,
+                      'secondary-selection-middle': item.selectType == ItemSelectType.Middle,
+                      'secondary-selection-bottom': item.selectType == ItemSelectType.Bottom,
+                      'unselected-item': item == unselectedItem && ((options.showSelection && item.showSelection != false) || (!options.showSelection && item.showSelection)),
+                      'primary-selection': item == selectedItem && item.selected && ((options.showSelection && item.showSelection != false) || (!options.showSelection && item.showSelection)),
+                      'primary-selection-border-only': item == selectedItem && !item.selected && ((options.showSelection && item.showSelection != false) || (!options.showSelection && item.showSelection))}"
           [ngStyle]="{'cursor': item.cursor ? item.cursor : options.cursor}"
           [style]="'--textColor:' + (item.textColor ? item.textColor.toHex() : options.textColor!.toHex()) + ';' +
                    '--hoverColor:' + (item.hoverColor ? item.hoverColor.toHex() : options.hoverColor!.toHex()) + ';' +
-                   '--borderWidth:' + (item.selectionBorderWidth ? item.selectionBorderWidth: options.selectionBorderWidth) + 'px;' +
                    '--hoverTextColor:' + (item.hoverTextColor ? item.hoverTextColor.toHex() : options.hoverTextColor!.toHex()) + ';' +
+                   '--selectionBorderWidth:' + (item.selectionBorderWidth ? item.selectionBorderWidth: options.selectionBorderWidth) + 'px;' +
                    '--selectionTextColor:' + (item.selectionTextColor ? item.selectionTextColor.toHex() : options.selectionTextColor!.toHex()) + ';' +
                    '--selectionFillColor:' + (item.selectionFillColor ? item.selectionFillColor.toHex() : options.selectionFillColor!.toHex()) + ';' +
                    '--editedItemTextColor:' + (item.editedItemTextColor ? item.editedItemTextColor.toHex() : options.editedItemTextColor!.toHex()) + ';' +
                    '--indent:' + (options.indent! - ((item.selectionBorderWidth ? item.selectionBorderWidth: options.selectionBorderWidth!) + 1)) + 'px;' +
                    '--selectionBorderColor:' + (item.selectionBorderColor ? item.selectionBorderColor.toHex() : options.selectionBorderColor!.toHex()) + ';' +
-                   '--secondaryBorderWidth:' + (item.secondarySelectionBorderWidth ? item.secondarySelectionBorderWidth: options.secondarySelectionBorderWidth) + 'px;' +
+                   '--secondarySelectionBorderWidth:' + (item.secondarySelectionBorderWidth ? item.secondarySelectionBorderWidth: options.secondarySelectionBorderWidth) + 'px;' +
                    '--secondarySelectionTextColor:' + (item.secondarySelectionTextColor ? item.secondarySelectionTextColor.toHex() : options.secondarySelectionTextColor!.toHex()) + ';' +
                    '--secondarySelectionFillColor:' + (item.secondarySelectionFillColor ? item.secondarySelectionFillColor.toHex() : options.secondarySelectionFillColor!.toHex()) + ';' +
                    '--secondaryIndent:' + (options.indent! - ((item.secondarySelectionBorderWidth ? item.secondarySelectionBorderWidth: options.secondarySelectionBorderWidth!) + 1)) + 'px;' +
@@ -48,7 +48,6 @@
                (keydown.arrowup)="getTextCaretPosition()"
                (keydown.arrowdown)="getTextCaretPosition()"
                (keydown.backspace)="getTextCaretPosition()"
-               (keydown.arrowleft)="getTextCaretPosition()"
                (keydown.arrowleft)="getTextCaretPosition()"
                (keydown.arrowRight)="getTextCaretPosition()"
                [style.lineHeight.px]="options.itemHeight! - 2"

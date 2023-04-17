@@ -26,14 +26,14 @@ export class AppComponent {
 
   updateItem() {
     // this.managerList[4].cursor = 'crosshair';
-    // this.managerList[4].editable = false;
+    // this.managerList[4].editable = true;
     // this.managerList[4].fontSize = 20;
     // this.managerList[4].textColor = new Color(255, 0, 0, 1);
-    // this.managerList[4].deletable = false;
-    // this.managerList[4].selectable = false;
+    // this.managerList[4].deletable = true;
+    // this.managerList[4].selectable = true;
     // this.managerList[4].fontFamily = 'Segoe Print';
     // this.managerList[4].hoverColor = new Color(255, 0, 0, 1);
-    // this.managerList[4].unselectable = false;
+    // this.managerList[4].unselectable = true;
     // this.managerList[4].showSelection = false;
     // this.managerList[4].selectionFillColor = new Color(255, 0, 0, 1);
     // this.managerList[4].selectionBorderColor = new Color(255, 0, 0, 1);
@@ -57,8 +57,8 @@ export class AppComponent {
 
 
   addItem() {
-    this.list.addItem();
-    // this.list.addItem('x', 'Cat');
+    // this.list.addItem();
+    this.list.addItem('x', 'Cat');
   }
 
 
@@ -87,7 +87,7 @@ export class AppComponent {
 
   onPressedDeleteKey(itemsToBeDeleted: Array<ListItem>) {
     // console.log(itemsToBeDeleted);
-    this.list.deleteItem();
+    this.list.deleteItem(itemsToBeDeleted);
   }
 
 
