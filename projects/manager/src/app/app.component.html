@@ -8,7 +8,7 @@
 
 <div style="display: flex;">
       <div style="width: 300px; height: 260px; margin-right: 100px; background: rgb(51, 51, 51);">
-            <list #list
+            <editable-list #editableList
                   [list]="managerList"
                   [options]="managerListOptions"
                   (addedItemEvent)="onAddedItem($event)"
@@ -22,24 +22,16 @@
                   (rightClickedItemEvent)="onRightClickedItem($event)"
                   (requestedPageLoadEvent)="onRequestedPageLoad($event)"
                   (requestedItemCaseTypeEvent)="onRequestedItemCaseType($event)">
-            </list>
+            </editable-list>
       </div>
 
       <div style="width: 300px; height: 220px; background: rgba(22, 22, 22, 0.945);">
             <list #list
                   [list]="websiteList"
                   [options]="websiteListOptions"
-                  (addedItemEvent)="onAddedItem($event)"
-                  (editedItemEvent)="onEditedItem($event)"
-                  (pastedListEvent)="onPastedList($event)"
-                  (unselectedListEvent)="onUnselectedList()"
-                  (deletedItemsEvent)="onDeletedItems($event)"
                   (selectedItemsEvent)="onSelectedItems($event)"
                   (pressedEnterKeyEvent)="onPressedEnterKey($event)"
-                  (pressedDeleteKeyEvent)="onPressedDeleteKey($event)"
-                  (rightClickedItemEvent)="onRightClickedItem($event)"
-                  (requestedPageLoadEvent)="onRequestedPageLoad($event)"
-                  (requestedItemCaseTypeEvent)="onRequestedItemCaseType($event)">
+                  (requestedPageLoadEvent)="onRequestedPageLoad($event)">
             </list>
       </div>
 </div>

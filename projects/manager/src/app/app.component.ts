@@ -6,6 +6,7 @@ import { ListComponent } from './list/list.component';
 import { ManagerListOptions } from './manager-list-options';
 import { PageLoad } from './page-load';
 import { WebsiteListOptions } from './website-list-options';
+import { EditableListComponent } from './editable-list/editable-list.component';
 
 @Component({
   selector: 'app-root',
@@ -14,6 +15,7 @@ import { WebsiteListOptions } from './website-list-options';
 })
 export class AppComponent {
   @ViewChild('list') list!: ListComponent;
+  @ViewChild('editableList') editableList!: EditableListComponent;
   
   private listLength!: number;
 
@@ -58,17 +60,17 @@ export class AppComponent {
 
   addItem() {
     // this.list.addItem();
-    this.list.addItem('x', 'Cat');
+    this.editableList.addItem('x', 'Cat');
   }
 
 
   editItem() {
-    this.list.editItem();
+    this.editableList.editItem();
   }
 
 
   deleteItem() {
-    this.list.deleteItem();
+    this.editableList.deleteItem();
   }
 
 
@@ -87,7 +89,7 @@ export class AppComponent {
 
   onPressedDeleteKey(itemsToBeDeleted: Array<ListItem>) {
     // console.log(itemsToBeDeleted);
-    this.list.deleteItem(itemsToBeDeleted);
+    this.editableList.deleteItem(itemsToBeDeleted);
   }
 
 
