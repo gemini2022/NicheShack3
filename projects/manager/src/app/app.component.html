@@ -32,6 +32,22 @@
                   (selectedItemsEvent)="onSelectedItems($event)"
                   (pressedEnterKeyEvent)="onPressedEnterKey($event)"
                   (requestedPageLoadEvent)="onRequestedPageLoad($event)">
+
+                  <ng-template let-value="value" #content>
+                        <!-- <input #checkbox type="checkbox" (mousedown)="$event.stopPropagation()" (change)="trumpy(value)"> -->
+
+                        <label class="checkbox" (mousedown)="$event.stopPropagation()">
+                              <input type="checkbox"
+                                     (change)="trumpy(value)">
+                              <div #tabElement
+                                    tabindex="-1"
+                                    class="checkmark">
+                              </div>
+                        </label>
+
+
+                  </ng-template>
+
             </list>
       </div>
 </div>

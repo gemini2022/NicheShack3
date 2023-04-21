@@ -30,6 +30,9 @@ export class ListComponent {
   @ViewChildren('htmlItem') private htmlItems!: QueryList<ElementRef<HTMLElement>>;
 
 
+  @ContentChild('content') content!: TemplateRef<any>;
+
+
   private ngOnChanges(changes: SimpleChanges): void {
     // If any of the default options have been changed
     if (changes.options) this.options = new ListOptions(changes.options.currentValue);
@@ -42,7 +45,7 @@ export class ListComponent {
   }
 
 
-
+  
   public LoadPage(pageNumber: number) {
     this.loadedPages[pageNumber] = pageNumber;
     this.requestedPageLoadEvent.emit(new PageLoad(pageNumber, this.options.itemsPerPage!));

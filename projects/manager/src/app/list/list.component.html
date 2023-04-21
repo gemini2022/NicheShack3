@@ -21,6 +21,8 @@
                    '--indent:' + (options.indent! - ((item.selectionBorderWidth ? item.selectionBorderWidth: options.selectionBorderWidth!) + 1)) + 'px;' +
                    '--selectionBorderColor:' + (item.selectionBorderColor ? item.selectionBorderColor.toHex() : options.selectionBorderColor!.toHex()) + ';'">
 
+          <ng-container *ngTemplateOutlet="content; context:{value:item}"></ng-container>
+
           <div #htmlItemText
                tabindex="-1"
                class="item-text"

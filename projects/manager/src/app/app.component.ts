@@ -24,7 +24,9 @@ export class AppComponent {
   public managerList: Array<ListItem> = new Array<ListItem>();
   public websiteList: Array<ListItem> = new Array<ListItem>();
 
-
+  trumpy(checkbox: any){
+    console.log(checkbox)
+  }
 
   updateItem() {
     // this.managerList[4].cursor = 'crosshair';
