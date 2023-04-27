@@ -18,7 +18,7 @@
                    '--selectionBorderWidth:' + (item.selectionBorderWidth ? item.selectionBorderWidth: options.selectionBorderWidth) + 'px;' +
                    '--selectionTextColor:' + (item.selectionTextColor ? item.selectionTextColor.toHex() : options.selectionTextColor!.toHex()) + ';' +
                    '--selectionFillColor:' + (item.selectionFillColor ? item.selectionFillColor.toHex() : options.selectionFillColor!.toHex()) + ';' +
-                   '--indent:' + (options.indent! - ((item.selectionBorderWidth ? item.selectionBorderWidth: options.selectionBorderWidth!) + 1)) + 'px;' +
+                   '--indent:' + (options.indent! - ((item.selectionBorderWidth ? item.selectionBorderWidth : options.selectionBorderWidth!) + 1)) + 'px;' +
                    '--selectionBorderColor:' + (item.selectionBorderColor ? item.selectionBorderColor.toHex() : options.selectionBorderColor!.toHex()) + ';'">
 
           <ng-container *ngTemplateOutlet="content; context:{value:item}"></ng-container>

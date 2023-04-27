@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ElementRef, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { Color } from './color';
 import { CaseType } from './enums';
 import { ListItem } from './list-item';
@@ -16,7 +16,7 @@ import { EditableListComponent } from './editable-list/editable-list.component';
 export class AppComponent {
   @ViewChild('list') list!: ListComponent;
   @ViewChild('editableList') editableList!: EditableListComponent;
-  
+
   private listLength!: number;
 
   public managerListOptions = new ManagerListOptions();
@@ -24,9 +24,25 @@ export class AppComponent {
   public managerList: Array<ListItem> = new Array<ListItem>();
   public websiteList: Array<ListItem> = new Array<ListItem>();
 
-  trumpy(checkbox: any){
-    console.log(checkbox)
+
+  // ===============================================================
+  // This code will be in the lazy-laod script
+
+  public tabElements: Array<HTMLElement> = new Array<HTMLElement>();
+  @ViewChildren('tabElement') HTMLElements!: QueryList<any>;
+
+  ngAfterViewInit() {
+    this.HTMLElements.forEach(x => {
+      if (x.tabElement) {
+        this.tabElements.push(x.tabElement)
+      } else {
+        this.tabElements.push(x);
+      }
+    })
+    console.log(this.tabElements)
   }
+  // ===============================================================
+
 
   updateItem() {
     // this.managerList[4].cursor = 'crosshair';
@@ -50,7 +66,7 @@ export class AppComponent {
 
   onRequestedPageLoad(pageLoad: PageLoad) {
     this.listLength = this.managerList.length;
-    
+
     for (let i = this.listLength; i < this.listLength + pageLoad.itemsPerPage; i++) {
       this.managerList.push({ id: i.toString(), text: 'item' + (i + 1) });
       this.websiteList.push({ id: i.toString(), text: 'item' + (i + 1) });
@@ -122,5 +138,11 @@ export class AppComponent {
 
   onPastedList(pastedList: Array<ListItem>) {
     // console.log(pastedList)
+  }
+
+
+
+  onCheckboxChanged(isChecked: boolean) {
+    console.log(isChecked)
   }
 }

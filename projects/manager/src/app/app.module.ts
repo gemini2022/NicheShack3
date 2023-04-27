@@ -4,12 +4,14 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { ListComponent } from './list/list.component';
 import { EditableListComponent } from './editable-list/editable-list.component';
+import { CheckboxComponent } from './checkbox/checkbox.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     ListComponent,
-    EditableListComponent
+    EditableListComponent,
+    CheckboxComponent
   ],
   imports: [
     BrowserModule,

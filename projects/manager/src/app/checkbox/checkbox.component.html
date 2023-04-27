@@ -1,0 +1,43 @@
+<label class="checkbox-container"
+       [style.height.px]="options.containerHeight"
+       [style.paddingLeft.px]="options.containerPaddingLeft"
+       [style.paddingRight.px]="options.containerPaddingRight"
+       [ngStyle]="{'justify-content': options.spaceBetween ? 'space-between' : 'flex-start'}"
+       [style]="'--labelColor:' + options.labelColor!.toHex() + ';' +
+                '--checkmarkColor:' + options.checkmarkColor!.toHex() + ';' +
+                '--labelHoverColor:' + options.labelHoverColor!.toHex() + ';' +
+                '--checkmarkHoverColor:' + options.checkmarkHoverColor!.toHex() + ';' +
+                '--checkboxBorderColor:' + options.checkboxBorderColor!.toHex() + ';' +
+                '--checkboxBackgroundColor:' + options.checkboxBackgroundColor!.toHex() + ';' +
+                '--checkboxBorderHoverColor:' + options.checkboxBorderHoverColor!.toHex() + ';' +
+                '--checkboxFocusOutlineColor:' + options.checkboxFocusOutlineColor!.toHex() + ';' +
+                '--checkboxBorderCheckedColor:' + options.checkboxBorderCheckedColor!.toHex() + ';' +
+                '--checkboxBackgroundHoverColor:' + options.checkboxBackgroundHoverColor!.toHex() + ';' +
+                '--checkboxBackgroundCheckedColor:' + options.checkboxBackgroundCheckedColor!.toHex() + ';' +
+                '--hoverBackgroundColor:' + (options.showHoverBackground ? options.hoverBackgroundColor!.toHex() : null) + ';'">
+       
+    <input type="checkbox"
+           tabindex="-1"
+           [checked]="isChecked"
+           (change)="isChecked = !isChecked; checkboxChangedEvent.emit(isChecked)">
+
+    <div *ngIf="!options.labelPlacementRight"
+         class="label">
+        {{label}}
+    </div>
+
+    <div #tabElement
+         tabindex="0"
+         class="checkbox"
+         [style.borderWidth.px]="options.checkboxBorderWidth"
+         [style.borderRadius.px]="options.checkboxBorderRadius"
+         (keydown.space)="isChecked = !isChecked; checkboxChangedEvent.emit(isChecked)"
+         [style.marginLeft.px]="!options.labelPlacementRight && label ? options.checkboxMargin : 0"
+         [style.marginRight.px]="options.labelPlacementRight && label ? options.checkboxMargin : 0">
+    </div>
+
+    <div *ngIf="options.labelPlacementRight"
+         class="label">
+        {{label}}
+    </div>
+</label>

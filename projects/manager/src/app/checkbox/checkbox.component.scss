@@ -1,0 +1,87 @@
+.checkbox-container {
+    display: flex;
+    position: relative;
+    width: 100%;
+    cursor: pointer;
+    user-select: none;
+    align-items: center;
+    -ms-user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+
+    &:hover {
+        background: var(--hoverBackgroundColor);
+
+        .checkbox {
+            border-color: var(--checkboxBorderHoverColor);
+            background-color: var(--checkboxBackgroundHoverColor);
+
+            // Checkmark
+            &:after {
+                border: solid var(--checkmarkHoverColor);
+                border-width: 0 3px 3px 0;
+                transform: rotate(45deg);
+                -ms-transform: rotate(45deg);
+                -webkit-transform: rotate(45deg);
+            }
+        }
+
+        .label {
+            color: var(--labelHoverColor);
+        }
+    }
+
+
+    & input {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 0;
+        height: 0;
+
+        &:checked~.checkbox {
+            border-color: var(--checkboxBorderCheckedColor);
+            background-color: var(--checkboxBackgroundCheckedColor);
+
+            // Checkmark
+            &:after {
+                display: block;
+            }
+        }
+    }
+
+
+    .checkbox {
+        position: relative;
+        width: 15px;
+        height: 15px;
+        border: solid var(--checkboxBorderColor);
+        background-color: var(--checkboxBackgroundColor);
+
+        &:focus-visible {
+            outline-offset: 2px;
+            outline: 1px solid var(--checkboxFocusOutlineColor);
+        }
+
+        // Checkmark
+        &:after {
+            content: "";
+            position: absolute;
+            display: none;
+            left: 4px;
+            top: -3px;
+            width: 5px;
+            height: 10px;
+            border: solid var(--checkmarkColor);
+            border-width: 0 3px 3px 0;
+            -webkit-transform: rotate(45deg);
+            -ms-transform: rotate(45deg);
+            transform: rotate(45deg);
+        }
+    }
+
+
+    .label {
+        color: var(--labelColor);
+    }
+}
