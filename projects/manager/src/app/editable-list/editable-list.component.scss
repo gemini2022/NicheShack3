@@ -19,11 +19,9 @@
 
 .secondary-selection-top:not(.primary-selection) {
     border-bottom: hidden;
-    padding-left: var(--secondaryIndent);
     color: var(--secondarySelectionTextColor);
     background: var(--secondarySelectionFillColor);
     border-color: var(--secondarySelectionBorderColor);
-    border-width: var(--secondarySelectionBorderWidth);
     padding-bottom: var(--secondarySelectionBorderWidth);
 }
 
@@ -32,12 +30,10 @@
 .secondary-selection-middle:not(.primary-selection) {
     border-top: hidden;
     border-bottom: hidden;
-    padding-left: var(--secondaryIndent);
     color: var(--secondarySelectionTextColor);
     background: var(--secondarySelectionFillColor);
     padding-top: var(--secondarySelectionBorderWidth);
     border-color: var(--secondarySelectionBorderColor);
-    border-width: var(--secondarySelectionBorderWidth);
     padding-bottom: var(--secondarySelectionBorderWidth);
 }
 
@@ -45,11 +41,9 @@
 
 .secondary-selection-bottom:not(.primary-selection) {
     border-top: hidden;
-    padding-left: var(--secondaryIndent);
     color: var(--secondarySelectionTextColor);
     background: var(--secondarySelectionFillColor);
     padding-top: var(--secondarySelectionBorderWidth);
-    border-width: var(--secondarySelectionBorderWidth);
     border-color: var(--secondarySelectionBorderColor);
 }
 

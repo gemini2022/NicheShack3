@@ -25,23 +25,23 @@ export class AppComponent {
   public websiteList: Array<ListItem> = new Array<ListItem>();
 
 
-  // ===============================================================
-  // This code will be in the lazy-laod script
+  // // ===============================================================
+  // // This code will be in the lazy-laod script
 
-  public tabElements: Array<HTMLElement> = new Array<HTMLElement>();
-  @ViewChildren('tabElement') HTMLElements!: QueryList<any>;
+  // public tabElements: Array<HTMLElement> = new Array<HTMLElement>();
+  // @ViewChildren('tabElement') HTMLElements!: QueryList<any>;
 
-  ngAfterViewInit() {
-    this.HTMLElements.forEach(x => {
-      if (x.tabElement) {
-        this.tabElements.push(x.tabElement)
-      } else {
-        this.tabElements.push(x);
-      }
-    })
-    console.log(this.tabElements)
-  }
-  // ===============================================================
+  // ngAfterViewInit() {
+  //   this.HTMLElements.forEach(x => {
+  //     if (x.tabElement) {
+  //       this.tabElements.push(x.tabElement)
+  //     } else {
+  //       this.tabElements.push(x);
+  //     }
+  //   })
+  //   console.log(this.tabElements)
+  // }
+  // // ===============================================================
 
 
   updateItem() {

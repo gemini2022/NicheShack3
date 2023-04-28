@@ -10,15 +10,14 @@
           [style.height.px]="options.itemHeight"
           (mousedown)="onItemSelect(item, $event)"
           (contextmenu)="$event.preventDefault();"
+          [style.borderWidth.px]="item.selectionBorderWidth ? item.selectionBorderWidth : options.selectionBorderWidth"
           [ngClass]="{'primary-selection': item == selectedItem}"
           [ngStyle]="{'cursor': item.cursor ? item.cursor : options.cursor}"
           [style]="'--textColor:' + (item.textColor ? item.textColor.toHex() : options.textColor!.toHex()) + ';' +
                    '--hoverColor:' + (item.hoverColor ? item.hoverColor.toHex() : options.hoverColor!.toHex()) + ';' +
                    '--hoverTextColor:' + (item.hoverTextColor ? item.hoverTextColor.toHex() : options.hoverTextColor!.toHex()) + ';' +
-                   '--selectionBorderWidth:' + (item.selectionBorderWidth ? item.selectionBorderWidth: options.selectionBorderWidth) + 'px;' +
                    '--selectionTextColor:' + (item.selectionTextColor ? item.selectionTextColor.toHex() : options.selectionTextColor!.toHex()) + ';' +
                    '--selectionFillColor:' + (item.selectionFillColor ? item.selectionFillColor.toHex() : options.selectionFillColor!.toHex()) + ';' +
-                   '--indent:' + (options.indent! - ((item.selectionBorderWidth ? item.selectionBorderWidth : options.selectionBorderWidth!) + 1)) + 'px;' +
                    '--selectionBorderColor:' + (item.selectionBorderColor ? item.selectionBorderColor.toHex() : options.selectionBorderColor!.toHex()) + ';'">
 
           <ng-container *ngTemplateOutlet="content; context:{value:item}"></ng-container>
@@ -28,7 +27,8 @@
                class="item-text"
                [style.lineHeight.px]="options.itemHeight! - 2"
                [style.fontSize.px]="item.fontSize ? item.fontSize : options.fontSize"
-               [style.fontFamily]="item.fontFamily ? item.fontFamily : options.fontFamily">
+               [style.fontFamily]="item.fontFamily ? item.fontFamily : options.fontFamily"
+               [style.paddingLeft.px]="options.indent! - ((item.selectionBorderWidth ? item.selectionBorderWidth: options.selectionBorderWidth!) + 1)">
                {{item.text}}
           </div>
      </div>

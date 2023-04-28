@@ -12,6 +12,9 @@
           [style.height.px]="options.itemHeight"
           (mousedown)="onItemSelect(item, $event)"
           (contextmenu)="$event.preventDefault();"
+          [style.borderWidth.px]="item.selected && item != selectedItem ?
+                                  (item.secondarySelectionBorderWidth ? item.secondarySelectionBorderWidth : options.secondarySelectionBorderWidth) :
+                                  (item.selectionBorderWidth ? item.selectionBorderWidth : options.selectionBorderWidth)"
           [ngClass]="{'edited-item': item == editedItem,
                       'disabled-item': editedItem && editedItem != item,
                       'secondary-selection-all': item.selectType == ItemSelectType.All,
@@ -25,18 +28,14 @@
           [style]="'--textColor:' + (item.textColor ? item.textColor.toHex() : options.textColor!.toHex()) + ';' +
                    '--hoverColor:' + (item.hoverColor ? item.hoverColor.toHex() : options.hoverColor!.toHex()) + ';' +
                    '--hoverTextColor:' + (item.hoverTextColor ? item.hoverTextColor.toHex() : options.hoverTextColor!.toHex()) + ';' +
-                   '--selectionBorderWidth:' + (item.selectionBorderWidth ? item.selectionBorderWidth: options.selectionBorderWidth) + 'px;' +
                    '--selectionTextColor:' + (item.selectionTextColor ? item.selectionTextColor.toHex() : options.selectionTextColor!.toHex()) + ';' +
                    '--selectionFillColor:' + (item.selectionFillColor ? item.selectionFillColor.toHex() : options.selectionFillColor!.toHex()) + ';' +
                    '--editedItemTextColor:' + (item.editedItemTextColor ? item.editedItemTextColor.toHex() : options.editedItemTextColor!.toHex()) + ';' +
-                   '--indent:' + (options.indent! - ((item.selectionBorderWidth ? item.selectionBorderWidth: options.selectionBorderWidth!) + 1)) + 'px;' +
                    '--selectionBorderColor:' + (item.selectionBorderColor ? item.selectionBorderColor.toHex() : options.selectionBorderColor!.toHex()) + ';' +
                    '--secondarySelectionBorderWidth:' + (item.secondarySelectionBorderWidth ? item.secondarySelectionBorderWidth: options.secondarySelectionBorderWidth) + 'px;' +
                    '--secondarySelectionTextColor:' + (item.secondarySelectionTextColor ? item.secondarySelectionTextColor.toHex() : options.secondarySelectionTextColor!.toHex()) + ';' +
                    '--secondarySelectionFillColor:' + (item.secondarySelectionFillColor ? item.secondarySelectionFillColor.toHex() : options.secondarySelectionFillColor!.toHex()) + ';' +
-                   '--secondaryIndent:' + (options.indent! - ((item.secondarySelectionBorderWidth ? item.secondarySelectionBorderWidth: options.secondarySelectionBorderWidth!) + 1)) + 'px;' +
                    '--secondarySelectionBorderColor:' + (item.secondarySelectionBorderColor ? item.secondarySelectionBorderColor.toHex() : options.secondarySelectionBorderColor!.toHex()) + ';'">
-
 
           <div #htmlItemText
                tabindex="-1"
@@ -53,7 +52,10 @@
                [style.lineHeight.px]="options.itemHeight! - 2"
                [ngClass]="{'edited-item-text': item == editedItem}"
                [style.fontSize.px]="item.fontSize ? item.fontSize : options.fontSize"
-               [style.fontFamily]="item.fontFamily ? item.fontFamily : options.fontFamily">
+               [style.fontFamily]="item.fontFamily ? item.fontFamily : options.fontFamily"
+               [style.paddingLeft.px]="item.selected && item != selectedItem ?
+                                      (options.indent! - ((item.secondarySelectionBorderWidth ? item.secondarySelectionBorderWidth: options.secondarySelectionBorderWidth!) + 1)) :
+                                      (options.indent! - ((item.selectionBorderWidth ? item.selectionBorderWidth: options.selectionBorderWidth!) + 1))">
                {{item.text}}
           </div>
      </div>

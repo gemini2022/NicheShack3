@@ -18,7 +18,7 @@ export class ListOptions {
     public multiselectable?: boolean = true;
     public selectionBorderWidth?: number = 1;
     public noSelectOnArrowKey?: boolean = false;
-    public secondarySelectionBorderWidth?: number = 1;
+    public secondarySelectionBorderWidth?: number = 3;
     public textColor?: Color = new Color(160, 160, 160, 1);
     public hoverColor?: Color = new Color(255, 255, 255, 0.03);
     public fontFamily?: string = 'Arial, Helvetica, sans-serif';

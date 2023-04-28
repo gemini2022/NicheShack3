@@ -12,8 +12,7 @@
     user-select: none;
     align-items: center;
     color: var(--textColor);
-    padding-left: var(--indent);
-    border: var(--selectionBorderWidth) solid transparent;
+    border: solid transparent;
 
     &:hover:not(.edited-item):not(.unselected-item):not(.primary-selection):not(.secondary-selection-all):not(.secondary-selection-top):not(.secondary-selection-middle):not(.secondary-selection-bottom):not(.primary-selection-border):not(.disabled-item) {
         color: var(--hoverTextColor);
@@ -39,7 +38,7 @@
     width: 100%;
     outline: none;
     background: none;
-    margin-top: -1px;
+    // margin-top: -1px;
     overflow: hidden;
     white-space: nowrap;
     border: 1px solid rgba(0, 0, 0, 0);
