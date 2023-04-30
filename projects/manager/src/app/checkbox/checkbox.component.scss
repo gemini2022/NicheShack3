@@ -2,14 +2,14 @@
     display: flex;
     position: relative;
     width: 100%;
-    cursor: pointer;
     user-select: none;
     align-items: center;
     -ms-user-select: none;
     -moz-user-select: none;
     -webkit-user-select: none;
 
-    &:hover {
+    &:hover:not(.disabled) {
+        cursor: pointer;
         background: var(--hoverBackgroundColor);
 
         .checkbox {

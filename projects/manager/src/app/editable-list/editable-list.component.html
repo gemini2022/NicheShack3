@@ -37,6 +37,24 @@
                    '--secondarySelectionFillColor:' + (item.secondarySelectionFillColor ? item.secondarySelectionFillColor.toHex() : options.secondarySelectionFillColor!.toHex()) + ';' +
                    '--secondarySelectionBorderColor:' + (item.secondarySelectionBorderColor ? item.secondarySelectionBorderColor.toHex() : options.secondarySelectionBorderColor!.toHex()) + ';'">
 
+
+          <div style="height: 26px; padding-right: 5px;"
+               (mousedown)="checkboxDown = true"
+               [style.marginLeft.px]="item.selected && item != selectedItem ?
+                                     -(item.secondarySelectionBorderWidth ? item.secondarySelectionBorderWidth: options.secondarySelectionBorderWidth!) :
+                                     -(item.selectionBorderWidth ? item.selectionBorderWidth: options.selectionBorderWidth!)"
+               [style.paddingLeft.px]="options.indent"
+               [style.marginRight.px]="-1">
+
+               <checkbox [isDisabled]="editedItem ? true : false"
+                         (checkboxChangedEvent)="onCheckboxChanged($event, item)"
+                         [style.opacity]="editedItem && editedItem == item ? 0.2 : 1"
+                         [options]="{containerHeight: 26, disabledOpacity: 1}">
+               </checkbox>
+          </div>
+
+
+
           <div #htmlItemText
                tabindex="-1"
                class="item-text"
@@ -52,11 +70,8 @@
                [style.lineHeight.px]="options.itemHeight! - 2"
                [ngClass]="{'edited-item-text': item == editedItem}"
                [style.fontSize.px]="item.fontSize ? item.fontSize : options.fontSize"
-               [style.fontFamily]="item.fontFamily ? item.fontFamily : options.fontFamily"
-               [style.paddingLeft.px]="item.selected && item != selectedItem ?
-                                      (options.indent! - ((item.secondarySelectionBorderWidth ? item.secondarySelectionBorderWidth: options.secondarySelectionBorderWidth!) + 1)) :
-                                      (options.indent! - ((item.selectionBorderWidth ? item.selectionBorderWidth: options.selectionBorderWidth!) + 1))">
-               {{item.text}}
+               [style.fontFamily]="item.fontFamily ? item.fontFamily : options.fontFamily">
+                    {{item.text}}
           </div>
      </div>
 </div>

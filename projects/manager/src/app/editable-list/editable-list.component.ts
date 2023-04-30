@@ -42,43 +42,65 @@ export class EditableListComponent extends ListComponent {
 
 
 
+  public checkboxDown!: boolean;
+
+
+
+  onCheckboxChanged(isChecked: boolean, item: ListItem) {
+    console.log(isChecked, item)
+  }
+
+
+
   public onItemSelect(item: ListItem, mouseEvent: MouseEvent): void {
-    const rightButton = 2;
-    this.stopMouseDownPropagation = true;
+    if (this.checkboxDown) {
+      this.checkboxDown = false;
+      this.stopMouseDownPropagation = true;
+      
+    } else {
 
 
-    // As long as the item that just received this mouse down is (NOT) currently being edited
-    if (this._editedItem != item) {
 
-      // If another item is being edited, remove it from edit mode
-      if (this._editedItem) this.exitItemEdit(undefined, true);
+      const rightButton = 2;
+      this.stopMouseDownPropagation = true;
 
 
-      // As long as the list (IS) selectable and the item itself (IS) selectable
-      if ((this.options.selectable && item.selectable != false) ||
-        // Or if the list is (NOT) selectable but the item itself (IS) selectable
-        (!this.options.selectable && item.selectable)) {
+      // As long as the item that just received this mouse down is (NOT) currently being edited
+      if (this._editedItem != item) {
+
+        // If another item is being edited, remove it from edit mode
+        if (this._editedItem) this.exitItemEdit(undefined, true);
 
 
-        // If this item is being selected from a right mouse down
-        if (mouseEvent.button == rightButton) {
-          this.rightClickedItemEvent.emit(item);
+        // As long as the list (IS) selectable and the item itself (IS) selectable
+        if ((this.options.selectable && item.selectable != false) ||
+          // Or if the list is (NOT) selectable but the item itself (IS) selectable
+          (!this.options.selectable && item.selectable)) {
+
+
+          // If this item is being selected from a right mouse down
+          if (mouseEvent.button == rightButton) {
+            this.rightClickedItemEvent.emit(item);
+          }
+
+          // And as long as we're (NOT) right clicking on an item that's already selected
+          if (!(mouseEvent.button == rightButton && item.selected)) {
+
+            // Set the selection for the item
+            this.setItemSelection(item);
+          }
+
+          // If the list is (NOT) selectable and the item itself is (NOT) selectable
+        } else {
+
+          // Then reinitialize the list
+          this.reinitializeList();
         }
-
-        // And as long as we're (NOT) right clicking on an item that's already selected
-        if (!(mouseEvent.button == rightButton && item.selected)) {
-
-          // Set the selection for the item
-          this.setItemSelection(item);
-        }
-
-        // If the list is (NOT) selectable and the item itself is (NOT) selectable
-      } else {
-
-        // Then reinitialize the list
-        this.reinitializeList();
       }
     }
+
+
+
   }
 
 
