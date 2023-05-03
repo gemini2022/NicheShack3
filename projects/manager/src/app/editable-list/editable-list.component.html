@@ -12,10 +12,12 @@
           [style.height.px]="options.itemHeight"
           (mousedown)="onItemSelect(item, $event)"
           (contextmenu)="$event.preventDefault();"
+          [ngStyle]="{'cursor': item.cursor ? item.cursor : options.cursor}"
           [style.opacity]="editedItem && editedItem != item ? options.disabledOpacity : 1"
           [style.borderWidth.px]="item.selected && item != selectedItem ?
                                   (item.secondarySelectionBorderWidth ? item.secondarySelectionBorderWidth : options.secondarySelectionBorderWidth) :
                                   (item.selectionBorderWidth ? item.selectionBorderWidth : options.selectionBorderWidth)"
+                                  
           [ngClass]="{'edited-item': item == editedItem,
                       'disabled-item': editedItem && editedItem != item,
                       'secondary-selection-all': item.selectType == ItemSelectType.All,
@@ -25,7 +27,7 @@
                       'unselected-item': item == unselectedItem && ((options.showSelection && item.showSelection != false) || (!options.showSelection && item.showSelection)),
                       'primary-selection': item == selectedItem && item.selected && ((options.showSelection && item.showSelection != false) || (!options.showSelection && item.showSelection)),
                       'primary-selection-border-only': item == selectedItem && !item.selected && ((options.showSelection && item.showSelection != false) || (!options.showSelection && item.showSelection))}"
-          [ngStyle]="{'cursor': item.cursor ? item.cursor : options.cursor}"
+          
           [style]="'--textColor:' + (item.textColor ? item.textColor.toHex() : options.textColor!.toHex()) + ';' +
                    '--hoverColor:' + (item.hoverColor ? item.hoverColor.toHex() : options.hoverColor!.toHex()) + ';' +
                    '--hoverTextColor:' + (item.hoverTextColor ? item.hoverTextColor.toHex() : options.hoverTextColor!.toHex()) + ';' +

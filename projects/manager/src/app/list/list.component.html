@@ -7,12 +7,12 @@
           #htmlItem
           class="item"
           tabindex="-1"
-          [style.height.px]="options.itemHeight"
           (mousedown)="onItemSelect(item)"
+          [style.height.px]="options.itemHeight"
           (contextmenu)="$event.preventDefault();"
-          [style.borderWidth.px]="item.selectionBorderWidth ? item.selectionBorderWidth : options.selectionBorderWidth"
           [ngClass]="{'primary-selection': item == selectedItem}"
           [ngStyle]="{'cursor': item.cursor ? item.cursor : options.cursor}"
+          [style.borderWidth.px]="item.selectionBorderWidth ? item.selectionBorderWidth : options.selectionBorderWidth"
           [style]="'--textColor:' + (item.textColor ? item.textColor.toHex() : options.textColor!.toHex()) + ';' +
                    '--hoverColor:' + (item.hoverColor ? item.hoverColor.toHex() : options.hoverColor!.toHex()) + ';' +
                    '--hoverTextColor:' + (item.hoverTextColor ? item.hoverTextColor.toHex() : options.hoverTextColor!.toHex()) + ';' +

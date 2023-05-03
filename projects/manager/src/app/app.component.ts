@@ -55,7 +55,7 @@ export class AppComponent {
 
 
   updateItem() {
-    this.editableCheckboxList[4].checkboxBorderColor = new Color(0, 0, 255, 1);
+    // this.editableCheckboxList[4].checkboxBorderColor = new Color(0, 0, 255, 1);
     // this.managerList[4].cursor = 'crosshair';
     // this.managerList[4].editable = true;
     // this.managerList[4].fontSize = 20;

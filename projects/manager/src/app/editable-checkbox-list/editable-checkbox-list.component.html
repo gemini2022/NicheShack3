@@ -1,10 +1,17 @@
-<editable-list [list]="list" [options]="options">
-    <ng-template #template let-item="referenceItem" let-selectedItem="referenceSelectedItem" let-editedItem="referenceEditedItem">
+<editable-list [list]="list"
+               [options]="options">
+
+    <ng-template #template
+                 let-item="referenceItem"
+                 let-editedItem="referenceEditedItem"
+                 let-selectedItem="referenceSelectedItem">
+                 
         <div [style.marginRight.px]="-1"
              [style.height.px]="options.itemHeight"
              [style.marginLeft.px]="item.selected && item != selectedItem ?
                                      -(item.secondarySelectionBorderWidth ? item.secondarySelectionBorderWidth: options.secondarySelectionBorderWidth!) :
                                      -(item.selectionBorderWidth ? item.selectionBorderWidth: options.selectionBorderWidth!)">
+
             <checkbox [isDisabled]="editedItem ? true : false"
                       [style.opacity]="editedItem && editedItem == item ? options.disabledOpacity : 1"
                       (checkboxChangedEvent)="item.isChecked = $event; itemCheckboxChangedEvent.emit(item)"
