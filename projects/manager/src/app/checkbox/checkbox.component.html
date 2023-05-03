@@ -32,8 +32,8 @@
     </div>
 
     <div #tabElement
-         tabindex="0"
          class="checkbox"
+         [tabindex]="options.tabIndex"
          [style.borderWidth.px]="options.checkboxBorderWidth"
          [style.borderRadius.px]="options.checkboxBorderRadius"
          (keydown.space)="isChecked = !isChecked;

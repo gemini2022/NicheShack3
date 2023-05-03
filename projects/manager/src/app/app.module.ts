@@ -5,13 +5,15 @@ import { AppComponent } from './app.component';
 import { ListComponent } from './list/list.component';
 import { EditableListComponent } from './editable-list/editable-list.component';
 import { CheckboxComponent } from './checkbox/checkbox.component';
+import { EditableCheckboxListComponent } from './editable-checkbox-list/editable-checkbox-list.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     ListComponent,
     EditableListComponent,
-    CheckboxComponent
+    CheckboxComponent,
+    EditableCheckboxListComponent
   ],
   imports: [
     BrowserModule,

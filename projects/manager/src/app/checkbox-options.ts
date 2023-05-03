@@ -1,6 +1,7 @@
 import { Color } from "./color";
 
 export class CheckboxOptions {
+    public tabIndex?: number = 0;
     public labelFontSize?: number = 14;
     public containerHeight?: number = 15;
     public spaceBetween?: boolean = false;
@@ -10,8 +11,8 @@ export class CheckboxOptions {
     public checkboxBorderRadius?: number = 2;
     public containerPaddingLeft?: number = 0;
     public containerPaddingRight?: number = 0;
-    public showHoverBackground?: boolean = false;
     public labelPlacementRight?: boolean = true;
+    public showHoverBackground?: boolean = false;
     public labelColor?: Color = new Color(160, 160, 160, 1);
     public checkmarkColor?: Color = new Color(255, 186, 0, 1);
     public labelHoverColor?: Color = new Color(210, 210, 210, 1);
@@ -30,6 +31,7 @@ export class CheckboxOptions {
     constructor(checkboxOptions?: CheckboxOptions) {
         if (checkboxOptions) {
             if (checkboxOptions.labelColor) this.labelColor = checkboxOptions.labelColor;
+            if (checkboxOptions.tabIndex != null) this.tabIndex = checkboxOptions.tabIndex;
             if (checkboxOptions.checkmarkColor) this.checkmarkColor = checkboxOptions.checkmarkColor;
             if (checkboxOptions.spaceBetween != null) this.spaceBetween = checkboxOptions.spaceBetween;
             if (checkboxOptions.labelHoverColor) this.labelHoverColor = checkboxOptions.labelHoverColor;

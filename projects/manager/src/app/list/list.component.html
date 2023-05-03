@@ -8,7 +8,7 @@
           class="item"
           tabindex="-1"
           [style.height.px]="options.itemHeight"
-          (mousedown)="onItemSelect(item, $event)"
+          (mousedown)="onItemSelect(item)"
           (contextmenu)="$event.preventDefault();"
           [style.borderWidth.px]="item.selectionBorderWidth ? item.selectionBorderWidth : options.selectionBorderWidth"
           [ngClass]="{'primary-selection': item == selectedItem}"
@@ -20,7 +20,7 @@
                    '--selectionFillColor:' + (item.selectionFillColor ? item.selectionFillColor.toHex() : options.selectionFillColor!.toHex()) + ';' +
                    '--selectionBorderColor:' + (item.selectionBorderColor ? item.selectionBorderColor.toHex() : options.selectionBorderColor!.toHex()) + ';'">
 
-          <ng-container *ngTemplateOutlet="content; context:{value:item}"></ng-container>
+          <ng-container *ngTemplateOutlet="template; context:{referenceItem: item, referenceSelectedItem: selectedItem}"></ng-container>
 
           <div #htmlItemText
                tabindex="-1"

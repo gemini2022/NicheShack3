@@ -1,0 +1,29 @@
+<editable-list [list]="list" [options]="options">
+    <ng-template #template let-item="referenceItem" let-selectedItem="referenceSelectedItem" let-editedItem="referenceEditedItem">
+        <div [style.marginRight.px]="-1"
+             [style.height.px]="options.itemHeight"
+             [style.marginLeft.px]="item.selected && item != selectedItem ?
+                                     -(item.secondarySelectionBorderWidth ? item.secondarySelectionBorderWidth: options.secondarySelectionBorderWidth!) :
+                                     -(item.selectionBorderWidth ? item.selectionBorderWidth: options.selectionBorderWidth!)">
+            <checkbox [isDisabled]="editedItem ? true : false"
+                      [style.opacity]="editedItem && editedItem == item ? options.disabledOpacity : 1"
+                      (checkboxChangedEvent)="item.isChecked = $event; itemCheckboxChangedEvent.emit(item)"
+                      [options]="{disabledOpacity: 1,
+                                  tabIndex: options.tabIndex,
+                                  containerHeight: options.itemHeight,
+                                  containerPaddingLeft: options.indent,
+                                  containerPaddingRight: options.checkboxMarginRight,
+                                  checkmarkColor: item.checkmarkColor ? item.checkmarkColor : options.checkmarkColor,
+                                  checkboxBorderWidth: item.checkboxBorderWidth ? item.checkboxBorderWidth : options.checkboxBorderWidth,
+                                  checkboxBorderColor: item.checkboxBorderColor ? item.checkboxBorderColor : options.checkboxBorderColor,
+                                  checkmarkHoverColor: item.checkmarkHoverColor ? item.checkmarkHoverColor : options.checkmarkHoverColor,
+                                  checkboxBorderRadius: item.checkboxBorderRadius ? item.checkboxBorderRadius : options.checkboxBorderRadius,
+                                  checkboxBackgroundColor: item.checkboxBackgroundColor ? item.checkboxBackgroundColor : options.checkboxBackgroundColor,
+                                  checkboxBorderHoverColor: item.checkboxBorderHoverColor ? item.checkboxBorderHoverColor : options.checkboxBorderHoverColor,
+                                  checkboxBorderCheckedColor: item.checkboxBorderCheckedColor ? item.checkboxBorderCheckedColor : options.checkboxBorderCheckedColor,
+                                  checkboxBackgroundHoverColor: item.checkboxBackgroundHoverColor ? item.checkboxBackgroundHoverColor : options.checkboxBackgroundHoverColor,
+                                  checkboxBackgroundCheckedColor: item.checkboxBackgroundCheckedColor ? item.checkboxBackgroundCheckedColor : options.checkboxBackgroundCheckedColor}">
+            </checkbox>
+        </div>
+    </ng-template>
+</editable-list>

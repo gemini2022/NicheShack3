@@ -12,6 +12,7 @@
           [style.height.px]="options.itemHeight"
           (mousedown)="onItemSelect(item, $event)"
           (contextmenu)="$event.preventDefault();"
+          [style.opacity]="editedItem && editedItem != item ? options.disabledOpacity : 1"
           [style.borderWidth.px]="item.selected && item != selectedItem ?
                                   (item.secondarySelectionBorderWidth ? item.secondarySelectionBorderWidth : options.secondarySelectionBorderWidth) :
                                   (item.selectionBorderWidth ? item.selectionBorderWidth : options.selectionBorderWidth)"
@@ -37,24 +38,10 @@
                    '--secondarySelectionFillColor:' + (item.secondarySelectionFillColor ? item.secondarySelectionFillColor.toHex() : options.secondarySelectionFillColor!.toHex()) + ';' +
                    '--secondarySelectionBorderColor:' + (item.secondarySelectionBorderColor ? item.secondarySelectionBorderColor.toHex() : options.secondarySelectionBorderColor!.toHex()) + ';'">
 
-
-          <div style="height: 26px; padding-right: 5px;"
-               (mousedown)="checkboxDown = true"
-               [style.marginLeft.px]="item.selected && item != selectedItem ?
-                                     -(item.secondarySelectionBorderWidth ? item.secondarySelectionBorderWidth: options.secondarySelectionBorderWidth!) :
-                                     -(item.selectionBorderWidth ? item.selectionBorderWidth: options.selectionBorderWidth!)"
-               [style.paddingLeft.px]="options.indent"
-               [style.marginRight.px]="-1">
-
-               <checkbox [isDisabled]="editedItem ? true : false"
-                         (checkboxChangedEvent)="onCheckboxChanged($event, item)"
-                         [style.opacity]="editedItem && editedItem == item ? 0.2 : 1"
-                         [options]="{containerHeight: 26, disabledOpacity: 1}">
-               </checkbox>
+          <div (mousedown)="stopItemSelectionPropagation = true">
+               <ng-container *ngTemplateOutlet="template; context:{referenceItem: item, referenceSelectedItem: selectedItem, referenceEditedItem: editedItem}"></ng-container>
           </div>
-
-
-
+          
           <div #htmlItemText
                tabindex="-1"
                class="item-text"

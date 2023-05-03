@@ -7,6 +7,8 @@ import { ManagerListOptions } from './manager-list-options';
 import { PageLoad } from './page-load';
 import { WebsiteListOptions } from './website-list-options';
 import { EditableListComponent } from './editable-list/editable-list.component';
+import { EditableCheckboxListItem } from './editable-checkbox-list-item';
+import { EditableCheckboxListComponent } from './editable-checkbox-list/editable-checkbox-list.component';
 
 @Component({
   selector: 'app-root',
@@ -16,6 +18,7 @@ import { EditableListComponent } from './editable-list/editable-list.component';
 export class AppComponent {
   @ViewChild('list') list!: ListComponent;
   @ViewChild('editableList') editableList!: EditableListComponent;
+  @ViewChild('editableCheckboxList') editableCheckboxListVar!: EditableCheckboxListComponent;
 
   private listLength!: number;
 
@@ -23,6 +26,13 @@ export class AppComponent {
   public websiteListOptions = new WebsiteListOptions();
   public managerList: Array<ListItem> = new Array<ListItem>();
   public websiteList: Array<ListItem> = new Array<ListItem>();
+
+  public editableCheckboxList: Array<EditableCheckboxListItem> = new Array<EditableCheckboxListItem>();
+
+
+  trumpyFunction(checkbox: any){
+    console.log(checkbox)
+  }
 
 
   // // ===============================================================
@@ -45,6 +55,7 @@ export class AppComponent {
 
 
   updateItem() {
+    this.editableCheckboxList[4].checkboxBorderColor = new Color(0, 0, 255, 1);
     // this.managerList[4].cursor = 'crosshair';
     // this.managerList[4].editable = true;
     // this.managerList[4].fontSize = 20;
@@ -127,7 +138,7 @@ export class AppComponent {
 
 
   onRequestedItemCaseType(item: ListItem) {
-    item.caseType = CaseType.TitleCase;
+    // item.caseType = CaseType.TitleCase;
   }
 
 
@@ -144,5 +155,22 @@ export class AppComponent {
 
   onCheckboxChanged(isChecked: boolean) {
     console.log(isChecked)
+  }
+
+
+
+
+
+
+
+  onEditableCheckboxListRequestedPageLoad(pageLoad: PageLoad) {
+    for (let i = 0; i < pageLoad.itemsPerPage; i++) {
+      this.editableCheckboxList.push({ id: i.toString(), text: 'editableCheckboxItem' + (i + 1) });
+    }
+  }
+
+
+  onItemCheckboxChanged(item: EditableCheckboxListItem) {
+    console.log(item)
   }
 }

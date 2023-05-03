@@ -1,7 +1,8 @@
 import { Component, ElementRef, EventEmitter, Input, Output, QueryList, SimpleChanges, ViewChildren } from '@angular/core';
 import { ItemSelectType, CaseType } from '../enums';
-import { ListItem } from '../list-item';
 import { ListComponent } from '../list/list.component';
+import { EditableListItem } from '../editable-list-item';
+import { EditableListOptions } from '../editable-list-options';
 
 @Component({
   selector: 'editable-list',
@@ -10,60 +11,60 @@ import { ListComponent } from '../list/list.component';
 })
 export class EditableListComponent extends ListComponent {
   // Private
+  protected _selectedItem!: EditableListItem;
   private isNewItem!: boolean;
-  private pivotItem!: ListItem;
+  private pivotItem!: EditableListItem;
   private ctrlKeyDown!: boolean;
   private shiftKeyDown!: boolean;
-  private _editedItem!: ListItem;
-  private _unselectedItem!: ListItem;
-  private _itemSelectType = ItemSelectType;
+  private _editedItem!: EditableListItem;
+  private _unselectedItem!: EditableListItem;
   private textCaretPosition!: Selection;
+  private _itemSelectType = ItemSelectType;
   private lastScrollTopPosition: number = 0;
   private stopMouseDownPropagation!: boolean;
 
+  // Inputs
+  @Input() public list!: Array<EditableListItem>;
+  @Input() public options: EditableListOptions = new EditableListOptions();
+
   // Public
+  public stopItemSelectionPropagation!: boolean;
+  public get selectedItem(): EditableListItem { return this._selectedItem; }
   public get ItemSelectType(): typeof ItemSelectType { return this._itemSelectType; }
-  public get editedItem(): ListItem { return this._editedItem; }
-  public get unselectedItem(): ListItem { return this._unselectedItem; }
+  public get editedItem(): EditableListItem { return this._editedItem; }
+  public get unselectedItem(): EditableListItem { return this._unselectedItem; }
 
   // Events
-  @Output() public addedItemEvent: EventEmitter<ListItem> = new EventEmitter();
-  @Output() public editedItemEvent: EventEmitter<ListItem> = new EventEmitter();
+  @Output() public addedItemEvent: EventEmitter<EditableListItem> = new EventEmitter();
+  @Output() public editedItemEvent: EventEmitter<EditableListItem> = new EventEmitter();
   @Output() public unselectedListEvent: EventEmitter<void> = new EventEmitter();
   @Output() public pressedEscapeKeyEvent: EventEmitter<void> = new EventEmitter();
-  @Output() public rightClickedItemEvent: EventEmitter<ListItem> = new EventEmitter();
-  @Output() public pastedListEvent: EventEmitter<Array<ListItem>> = new EventEmitter();
-  @Output() public deletedItemsEvent: EventEmitter<Array<ListItem>> = new EventEmitter();
-  @Output() public requestedItemCaseTypeEvent: EventEmitter<ListItem> = new EventEmitter();
-  @Output() public pressedDeleteKeyEvent: EventEmitter<Array<ListItem>> = new EventEmitter();
+  @Output() public rightClickedItemEvent: EventEmitter<EditableListItem> = new EventEmitter();
+  @Output() public pastedListEvent: EventEmitter<Array<EditableListItem>> = new EventEmitter();
+  @Output() public deletedItemsEvent: EventEmitter<Array<EditableListItem>> = new EventEmitter();
+  @Output() public requestedItemCaseTypeEvent: EventEmitter<EditableListItem> = new EventEmitter();
+  @Output() public pressedDeleteKeyEvent: EventEmitter<Array<EditableListItem>> = new EventEmitter();
 
   // View Children
   @ViewChildren('htmlItemText') private htmlItemTexts!: QueryList<ElementRef<HTMLElement>>;
 
 
 
-  public checkboxDown!: boolean;
-
-
-
-  onCheckboxChanged(isChecked: boolean, item: ListItem) {
-    console.log(isChecked, item)
+  protected ngOnChanges(changes: SimpleChanges): void {
+    // If any of the default options have been changed
+    if (changes.options) this.options = new EditableListOptions(changes.options.currentValue);
   }
 
 
 
-  public onItemSelect(item: ListItem, mouseEvent: MouseEvent): void {
-    if (this.checkboxDown) {
-      this.checkboxDown = false;
+  public onItemSelect(item: EditableListItem, mouseEvent?: MouseEvent): void {
+    if (this.stopItemSelectionPropagation) {
+      this.stopItemSelectionPropagation = false;
       this.stopMouseDownPropagation = true;
       
     } else {
-
-
-
       const rightButton = 2;
       this.stopMouseDownPropagation = true;
-
 
       // As long as the item that just received this mouse down is (NOT) currently being edited
       if (this._editedItem != item) {
@@ -79,12 +80,12 @@ export class EditableListComponent extends ListComponent {
 
 
           // If this item is being selected from a right mouse down
-          if (mouseEvent.button == rightButton) {
+          if (mouseEvent && mouseEvent.button == rightButton) {
             this.rightClickedItemEvent.emit(item);
           }
 
           // And as long as we're (NOT) right clicking on an item that's already selected
-          if (!(mouseEvent.button == rightButton && item.selected)) {
+          if (!(mouseEvent && mouseEvent.button == rightButton && item.selected)) {
 
             // Set the selection for the item
             this.setItemSelection(item);
@@ -107,7 +108,7 @@ export class EditableListComponent extends ListComponent {
 
 
 
-  protected setItemSelection(item: ListItem): void {
+  protected setItemSelection(item: EditableListItem): void {
     this._selectedItem = item;
     this._unselectedItem = null!;
 
@@ -142,7 +143,7 @@ export class EditableListComponent extends ListComponent {
 
 
   private setSelectedItemsShiftKey(): void {
-    const selectedItems: Array<ListItem> = new Array<ListItem>();
+    const selectedItems: Array<EditableListItem> = new Array<EditableListItem>();
 
     // Clear the selection for all items
     this.list.forEach(x => {
@@ -601,7 +602,7 @@ export class EditableListComponent extends ListComponent {
 
 
 
-  private reselectItem(item: ListItem): void {
+  private reselectItem(item: EditableListItem): void {
     this.isNewItem = false;
 
     // As long as the list (IS) selectable and the item itself (IS) selectable
@@ -646,7 +647,7 @@ export class EditableListComponent extends ListComponent {
 
 
 
-  private getCaseType(item: ListItem): string {
+  private getCaseType(item: EditableListItem): string {
     let text: string;
 
     switch (item.caseType) {
@@ -680,8 +681,8 @@ export class EditableListComponent extends ListComponent {
 
 
 
-  private getDeletedItems(): Array<ListItem> {
-    let itemsToBeDeleted: ListItem[] = [];
+  private getDeletedItems(): Array<EditableListItem> {
+    let itemsToBeDeleted: EditableListItem[] = [];
     const selectedItems = this.list.filter(x => x.selected);
 
     selectedItems.forEach(x => {
@@ -712,7 +713,7 @@ export class EditableListComponent extends ListComponent {
 
 
 
-  public deleteItem(deletedItems?: Array<ListItem>): void {
+  public deleteItem(deletedItems?: Array<EditableListItem>): void {
     // As long as an item is (NOT) being edited
     if (!this._editedItem) {
       const itemsToBeDeleted = deletedItems ? deletedItems : this.getDeletedItems();
@@ -764,8 +765,8 @@ export class EditableListComponent extends ListComponent {
 
 
 
-  private getNextSelectedItemAfterDelete(): ListItem {
-    let nextSelectedItem!: ListItem;
+  private getNextSelectedItemAfterDelete(): EditableListItem {
+    let nextSelectedItem!: EditableListItem;
 
     if (this._selectedItem) {
       const selectedItemIndex = this.list.indexOf(this._selectedItem);
@@ -1017,7 +1018,7 @@ export class EditableListComponent extends ListComponent {
 
       // Then add the rest of the pasted items to the list
       for (let i = index + 1; i < uniqueClipboardDataList.length; i++) {
-        this.list.splice(i, 0, new ListItem(uniqueClipboardDataList[i]));
+        this.list.splice(i, 0, new EditableListItem(uniqueClipboardDataList[i]));
       }
       if (this.options.sortable) this.sort();
 
@@ -1062,7 +1063,7 @@ export class EditableListComponent extends ListComponent {
 
 
 
-  private getHtmlItemText(item: ListItem): HTMLElement {
+  private getHtmlItemText(item: EditableListItem): HTMLElement {
     const index = this.list.indexOf(item);
     return this.htmlItemTexts.get(index)?.nativeElement!;
   }

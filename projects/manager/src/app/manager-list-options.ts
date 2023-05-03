@@ -1,9 +1,9 @@
 import { Color } from "./color";
-import { ListOptions } from "./list-options";
+import { EditableListOptions } from "./editable-list-options";
 
-export class ManagerListOptions extends ListOptions {
+export class ManagerListOptions extends EditableListOptions {
 
-    constructor(listOptions?: ListOptions) {
+    constructor(listOptions?: EditableListOptions) {
         super(listOptions);
         this.hoverColor = listOptions && listOptions.hoverColor ? listOptions.hoverColor : new Color(255, 186, 0, 0.03);
         this.selectionFillColor = listOptions && listOptions.selectionFillColor ? listOptions.selectionFillColor : new Color(255, 186, 0, 0.1);

@@ -30,10 +30,9 @@ export class ListComponent {
   @ViewChildren('htmlItem') private htmlItems!: QueryList<ElementRef<HTMLElement>>;
 
 
-  @ContentChild('content') content!: TemplateRef<any>;
+  @ContentChild('template') template!: TemplateRef<any>;
 
-
-  private ngOnChanges(changes: SimpleChanges): void {
+  protected ngOnChanges(changes: SimpleChanges): void {
     // If any of the default options have been changed
     if (changes.options) this.options = new ListOptions(changes.options.currentValue);
   }
@@ -45,7 +44,7 @@ export class ListComponent {
   }
 
 
-  
+
   public LoadPage(pageNumber: number) {
     this.loadedPages[pageNumber] = pageNumber;
     this.requestedPageLoadEvent.emit(new PageLoad(pageNumber, this.options.itemsPerPage!));
@@ -54,7 +53,7 @@ export class ListComponent {
 
 
 
-  public onItemSelect(item: ListItem, mouseEvent: MouseEvent): void {
+  public onItemSelect(item: ListItem): void {
     this._selectedItem = item;
     this.addEventListeners();
     this.selectedItemsEvent.emit([this._selectedItem]);
@@ -71,7 +70,7 @@ export class ListComponent {
   }
 
 
-  
+
 
 
 
