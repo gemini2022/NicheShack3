@@ -11,7 +11,7 @@ export class EditableListOptions extends ListOptions {
     public disabledOpacity?: number = 0.25;
     public multiselectable?: boolean = true;
     public noSelectOnArrowKey?: boolean = false;
-    public secondarySelectionBorderWidth?: number = 1;
+    public secondarySelectionBorderWidth?: number = 4;
     public editedItemTextColor?: Color = new Color(220, 220, 220, 1);
     public secondarySelectionTextColor?: Color = new Color(210, 210, 210, 1);
     public secondarySelectionFillColor?: Color = new Color(255, 255, 255, 0.05);

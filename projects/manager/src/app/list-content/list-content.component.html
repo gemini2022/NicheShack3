@@ -1,0 +1,35 @@
+<div #listContainer
+     class="list-container"
+     (scroll)="onScroll(listContainer)"
+     (wheel)="onMouseWheel($event, listContainer)">
+
+     <div *ngFor="let item of list"
+          #htmlItem
+          class="item"
+          tabindex="-1"
+          (mousedown)="onItemSelect(item)"
+          [style.height.px]="options.itemHeight"
+          (contextmenu)="$event.preventDefault();"
+          [ngClass]="{'primary-selection': item == selectedItem}"
+          [ngStyle]="{'cursor': item.cursor ? item.cursor : options.cursor}"
+          [style.borderWidth.px]="item.selectionBorderWidth ? item.selectionBorderWidth : options.selectionBorderWidth"
+          [style]="'--textColor:' + (item.textColor ? item.textColor.toHex() : options.textColor!.toHex()) + ';' +
+                   '--hoverColor:' + (item.hoverColor ? item.hoverColor.toHex() : options.hoverColor!.toHex()) + ';' +
+                   '--hoverTextColor:' + (item.hoverTextColor ? item.hoverTextColor.toHex() : options.hoverTextColor!.toHex()) + ';' +
+                   '--selectionTextColor:' + (item.selectionTextColor ? item.selectionTextColor.toHex() : options.selectionTextColor!.toHex()) + ';' +
+                   '--selectionFillColor:' + (item.selectionFillColor ? item.selectionFillColor.toHex() : options.selectionFillColor!.toHex()) + ';' +
+                   '--selectionBorderColor:' + (item.selectionBorderColor ? item.selectionBorderColor.toHex() : options.selectionBorderColor!.toHex()) + ';'">
+
+          <ng-container *ngTemplateOutlet="template; context:{referenceItem: item, referenceSelectedItem: selectedItem}"></ng-container>
+
+          <div #htmlItemText
+               tabindex="-1"
+               class="item-text"
+               [style.lineHeight.px]="options.itemHeight! - 2"
+               [style.fontSize.px]="item.fontSize ? item.fontSize : options.fontSize"
+               [style.fontFamily]="item.fontFamily ? item.fontFamily : options.fontFamily"
+               [style.marginLeft.px]="-1">
+               {{item.text}}
+          </div>
+     </div>
+</div>

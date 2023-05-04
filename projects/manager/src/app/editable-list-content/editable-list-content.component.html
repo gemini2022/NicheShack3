@@ -1,0 +1,67 @@
+<div #listContainer
+     class="list-container"
+     (scroll)="onScroll(listContainer)"
+     (wheel)="onMouseWheel($event, listContainer)"
+     (mousedown)="onListContainerMouseDown($event, listContainer)">
+
+    <div *ngFor="let item of list"
+         #htmlItem
+         class="item"
+         tabindex="-1"
+         (dblclick)="onItemDoubleClick()"
+         [style.height.px]="options.itemHeight"
+         (mousedown)="onItemSelect(item, $event)"
+         (contextmenu)="$event.preventDefault();"
+         [ngStyle]="{'cursor': item.cursor ? item.cursor : options.cursor}"
+         [style.opacity]="editedItem && editedItem != item ? options.disabledOpacity : 1"
+         [style.borderWidth.px]="item.selected && item != selectedItem ?
+                                 (item.secondarySelectionBorderWidth ? item.secondarySelectionBorderWidth : options.secondarySelectionBorderWidth) :
+                                 (item.selectionBorderWidth ? item.selectionBorderWidth : options.selectionBorderWidth)"
+                                  
+         [ngClass]="{'edited-item': item == editedItem,
+                     'disabled-item': editedItem && editedItem != item,
+                     'secondary-selection-all': item.selectType == ItemSelectType.All,
+                     'secondary-selection-top': item.selectType == ItemSelectType.Top,
+                     'secondary-selection-middle': item.selectType == ItemSelectType.Middle,
+                     'secondary-selection-bottom': item.selectType == ItemSelectType.Bottom,
+                     'unselected-item': item == unselectedItem && ((options.showSelection && item.showSelection != false) || (!options.showSelection && item.showSelection)),
+                     'primary-selection': item == selectedItem && item.selected && ((options.showSelection && item.showSelection != false) || (!options.showSelection && item.showSelection)),
+                     'primary-selection-border-only': item == selectedItem && !item.selected && ((options.showSelection && item.showSelection != false) || (!options.showSelection && item.showSelection))}"
+          
+         [style]="'--textColor:' + (item.textColor ? item.textColor.toHex() : options.textColor!.toHex()) + ';' +
+                  '--hoverColor:' + (item.hoverColor ? item.hoverColor.toHex() : options.hoverColor!.toHex()) + ';' +
+                  '--hoverTextColor:' + (item.hoverTextColor ? item.hoverTextColor.toHex() : options.hoverTextColor!.toHex()) + ';' +
+                  '--selectionTextColor:' + (item.selectionTextColor ? item.selectionTextColor.toHex() : options.selectionTextColor!.toHex()) + ';' +
+                  '--selectionFillColor:' + (item.selectionFillColor ? item.selectionFillColor.toHex() : options.selectionFillColor!.toHex()) + ';' +
+                  '--editedItemTextColor:' + (item.editedItemTextColor ? item.editedItemTextColor.toHex() : options.editedItemTextColor!.toHex()) + ';' +
+                  '--selectionBorderColor:' + (item.selectionBorderColor ? item.selectionBorderColor.toHex() : options.selectionBorderColor!.toHex()) + ';' +
+                  '--secondarySelectionBorderWidth:' + (item.secondarySelectionBorderWidth ? item.secondarySelectionBorderWidth: options.secondarySelectionBorderWidth) + 'px;' +
+                  '--secondarySelectionTextColor:' + (item.secondarySelectionTextColor ? item.secondarySelectionTextColor.toHex() : options.secondarySelectionTextColor!.toHex()) + ';' +
+                  '--secondarySelectionFillColor:' + (item.secondarySelectionFillColor ? item.secondarySelectionFillColor.toHex() : options.secondarySelectionFillColor!.toHex()) + ';' +
+                  '--secondarySelectionBorderColor:' + (item.secondarySelectionBorderColor ? item.secondarySelectionBorderColor.toHex() : options.secondarySelectionBorderColor!.toHex()) + ';'">
+
+        <div (mousedown)="stopItemSelectionPropagation = true">
+            <ng-container *ngTemplateOutlet="template; context:{referenceItem: item, referenceSelectedItem: selectedItem, referenceEditedItem: editedItem}"></ng-container>
+        </div>
+          
+        <div #htmlItemText
+             tabindex="-1"
+             class="item-text"
+             (mouseup)="getTextCaretPosition()"
+             (mousedown)="getTextCaretPosition()"
+             [contentEditable]="item == editedItem"
+             (keydown.space)="getTextCaretPosition()"
+             (keydown.arrowup)="getTextCaretPosition()"
+             (keydown.arrowdown)="getTextCaretPosition()"
+             (keydown.backspace)="getTextCaretPosition()"
+             (keydown.arrowleft)="getTextCaretPosition()"
+             (keydown.arrowRight)="getTextCaretPosition()"
+             [style.lineHeight.px]="options.itemHeight! - 2"
+             [ngClass]="{'edited-item-text': item == editedItem}"
+             [style.fontSize.px]="item.fontSize ? item.fontSize : options.fontSize"
+             [style.fontFamily]="item.fontFamily ? item.fontFamily : options.fontFamily"
+             [style.marginLeft.px]="-1">
+            {{item.text}}
+        </div>
+    </div>
+</div>

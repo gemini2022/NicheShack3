@@ -9,6 +9,7 @@ import { WebsiteListOptions } from './website-list-options';
 import { EditableListComponent } from './editable-list/editable-list.component';
 import { EditableCheckboxListItem } from './editable-checkbox-list-item';
 import { EditableCheckboxListComponent } from './editable-checkbox-list/editable-checkbox-list.component';
+import { EditableListItem } from './editable-list-item';
 
 @Component({
   selector: 'app-root',
@@ -24,7 +25,7 @@ export class AppComponent {
 
   public managerListOptions = new ManagerListOptions();
   public websiteListOptions = new WebsiteListOptions();
-  public managerList: Array<ListItem> = new Array<ListItem>();
+  public managerList: Array<EditableListItem> = new Array<EditableListItem>();
   public websiteList: Array<ListItem> = new Array<ListItem>();
 
   public editableCheckboxList: Array<EditableCheckboxListItem> = new Array<EditableCheckboxListItem>();
@@ -64,7 +65,7 @@ export class AppComponent {
     // this.managerList[4].selectable = true;
     // this.managerList[4].fontFamily = 'Segoe Print';
     // this.managerList[4].hoverColor = new Color(255, 0, 0, 1);
-    // this.managerList[4].unselectable = true;
+    this.managerList[4].unselectable = true;
     // this.managerList[4].showSelection = false;
     // this.managerList[4].selectionFillColor = new Color(255, 0, 0, 1);
     // this.managerList[4].selectionBorderColor = new Color(255, 0, 0, 1);
@@ -89,17 +90,17 @@ export class AppComponent {
 
   addItem() {
     // this.list.addItem();
-    this.editableList.addItem('x', 'Cat');
+    // this.editableList.addItem('x', 'Cat');
   }
 
 
   editItem() {
-    this.editableList.editItem();
+    // this.editableList.editItem();
   }
 
 
   deleteItem() {
-    this.editableList.deleteItem();
+    // this.editableList.deleteItem();
   }
 
 
@@ -118,12 +119,12 @@ export class AppComponent {
 
   onPressedDeleteKey(itemsToBeDeleted: Array<ListItem>) {
     // console.log(itemsToBeDeleted);
-    this.editableList.deleteItem(itemsToBeDeleted);
+    // this.editableList.deleteItem(itemsToBeDeleted);
   }
 
 
-  onPressedEnterKey(selectedItem: ListItem) {
-    // console.log(selectedItem);
+  onPressedEnterKey(selectedItem: EditableListItem) {
+    console.log(selectedItem);
   }
 
 
