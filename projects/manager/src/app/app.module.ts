@@ -8,6 +8,7 @@ import { CheckboxComponent } from './checkbox/checkbox.component';
 import { EditableCheckboxListComponent } from './editable-checkbox-list/editable-checkbox-list.component';
 import { ListContentComponent } from './list-content/list-content.component';
 import { EditableListContentComponent } from './editable-list-content/editable-list-content.component';
+import { IconFontListComponent } from './icon-font-list/icon-font-list.component';
 
 @NgModule({
   declarations: [
@@ -17,7 +18,8 @@ import { EditableListContentComponent } from './editable-list-content/editable-l
     CheckboxComponent,
     EditableCheckboxListComponent,
     ListContentComponent,
-    EditableListContentComponent
+    EditableListContentComponent,
+    IconFontListComponent
   ],
   imports: [
     BrowserModule,

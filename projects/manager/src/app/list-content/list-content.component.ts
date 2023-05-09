@@ -22,21 +22,50 @@ export class ListContentComponent {
   @Input() public options: ListOptions = new ListOptions();
 
   // Events
+  @Output() public mouseLeftItemEvent: EventEmitter<ListItem> = new EventEmitter();
   @Output() public pressedEnterKeyEvent: EventEmitter<ListItem> = new EventEmitter();
+  @Output() public mouseEnteredItemEvent: EventEmitter<ListItem> = new EventEmitter();
   @Output() public requestedPageLoadEvent: EventEmitter<PageLoad> = new EventEmitter();
   @Output() public selectedItemsEvent: EventEmitter<Array<ListItem>> = new EventEmitter();
 
   // View Children
+  @ContentChild('template') template!: TemplateRef<any>;
   @ViewChildren('htmlItem') private htmlItems!: QueryList<ElementRef<HTMLElement>>;
 
+  private mouseLeftItem!: ListItem;
 
-  @ContentChild('template') template!: TemplateRef<any>;
+  onMouseMove(e: MouseEvent, listContainer: HTMLElement) {
+    const mouseEnteredItem = this.getItem(e, listContainer);
+
+    if(mouseEnteredItem != this.mouseLeftItem) {
+      if(this.mouseLeftItem != null) this.mouseLeftItemEvent.emit(this.mouseLeftItem); 
+      this.mouseEnteredItemEvent.emit(mouseEnteredItem);
+    }
+    this.mouseLeftItem = mouseEnteredItem;
+  }
+
+
+  onMouseLeave() {
+    this.mouseLeftItemEvent.emit(this.mouseLeftItem);
+    this.mouseLeftItem = null!;
+  }
+
+
+
+  protected getItem(e: MouseEvent, listContainer: HTMLElement): ListItem {
+    const mousePosition = e.clientY + listContainer.scrollTop;
+    const listContainerTop = listContainer.getBoundingClientRect().top;
+    const itemPosition = (mousePosition - listContainerTop) / this.options.itemHeight!;
+    const itemIndex = Math.floor(itemPosition);
+
+    return this.list[itemIndex];
+  }
+
 
   protected ngOnChanges(changes: SimpleChanges): void {
     // If any of the default options have been changed
     if (changes.options) this.options = new ListOptions(changes.options.currentValue);
   }
-
 
 
   private ngOnInit(): void {

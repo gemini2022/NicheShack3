@@ -10,6 +10,8 @@ import { EditableListComponent } from './editable-list/editable-list.component';
 import { EditableCheckboxListItem } from './editable-checkbox-list-item';
 import { EditableCheckboxListComponent } from './editable-checkbox-list/editable-checkbox-list.component';
 import { EditableListItem } from './editable-list-item';
+import { IconFontListItem } from './icon-font-list-item';
+import { IconFontListOptions } from './icon-font-list-options';
 
 @Component({
   selector: 'app-root',
@@ -23,6 +25,8 @@ export class AppComponent {
 
   private listLength!: number;
 
+  public Color = Color;
+
   public managerListOptions = new ManagerListOptions();
   public websiteListOptions = new WebsiteListOptions();
   public managerList: Array<EditableListItem> = new Array<EditableListItem>();
@@ -30,11 +34,17 @@ export class AppComponent {
 
   public editableCheckboxList: Array<EditableCheckboxListItem> = new Array<EditableCheckboxListItem>();
 
+  public iconFontList: Array<IconFontListItem> = [
+    { iconFont: 'fa-solid fa-user', text: 'Your Account' },
+    { iconFont: 'fa-solid fa-cart-shopping', text: 'Your Orders' },
+    { iconFont: 'fa-solid fa-file-lines', text: 'Your List' },
+    { iconFont: 'fa-solid fa-address-card', text: 'Your Profile' },
+    { iconFont: 'fa-solid fa-envelope', text: 'Email Preferences' },
+    { iconFont: 'fa-solid fa-right-from-bracket', text: 'Log Out' },
+  ];
 
-  trumpyFunction(checkbox: any){
-    console.log(checkbox)
-  }
 
+  public iconFontListOptions = new IconFontListOptions({ itemHeight: 30, cursor: 'pointer' });
 
   // // ===============================================================
   // // This code will be in the lazy-laod script
@@ -65,13 +75,15 @@ export class AppComponent {
     // this.managerList[4].selectable = true;
     // this.managerList[4].fontFamily = 'Segoe Print';
     // this.managerList[4].hoverColor = new Color(255, 0, 0, 1);
-    this.managerList[4].unselectable = true;
+    // this.managerList[4].unselectable = true;
     // this.managerList[4].showSelection = false;
     // this.managerList[4].selectionFillColor = new Color(255, 0, 0, 1);
     // this.managerList[4].selectionBorderColor = new Color(255, 0, 0, 1);
     // this.managerList[4].selectionBorderWidth = 3;
     // this.managerList[4].secondarySelectionFillColor = new Color(255, 0, 0, 1);
     // this.managerList[4].secondarySelectionBorderColor = new Color(255, 0, 0, 1);
+
+    this.iconFontList[4].iconFontColor = new Color(255, 0, 0, 1);
   }
 
 
@@ -157,6 +169,7 @@ export class AppComponent {
   onCheckboxChanged(isChecked: boolean) {
     console.log(isChecked)
   }
+
 
 
 

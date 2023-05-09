@@ -1,7 +1,9 @@
 <list-content [list]="list"
               [options]="options"
               (selectedItemsEvent)="selectedItemsEvent.emit($event)"
+              (mouseLeftItemEvent)="mouseLeftItemEvent.emit($event)"
               (pressedEnterKeyEvent)="pressedEnterKeyEvent.emit($event)"
+              (mouseEnteredItemEvent)="mouseEnteredItemEvent.emit($event)"
               (requestedPageLoadEvent)="requestedPageLoadEvent.emit($event)">
 
                <ng-template #template

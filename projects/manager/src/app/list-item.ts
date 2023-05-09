@@ -1,8 +1,8 @@
 import { Color } from "./color";
 
 export class ListItem {
-    public id!: string;
-    public text!: string;
+    public id?: string;
+    public text?: string;
     public cursor?: string;
     public textColor?: Color;
     public fontSize?: number;

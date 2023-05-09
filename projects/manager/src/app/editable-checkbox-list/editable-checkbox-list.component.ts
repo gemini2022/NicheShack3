@@ -10,7 +10,7 @@ import { EditableCheckboxListOptions } from '../editable-checkbox-list-options';
 })
 export class EditableCheckboxListComponent extends EditableListComponent{
   // Inputs
-  @Input() public list!: Array<EditableCheckboxListItem>;
+  // @Input() public list!: Array<EditableCheckboxListItem>;
   @Input() public options: EditableCheckboxListOptions = new EditableCheckboxListOptions();
 
   // Events

@@ -12,6 +12,8 @@
          [style.height.px]="options.itemHeight"
          (mousedown)="onItemSelect(item, $event)"
          (contextmenu)="$event.preventDefault();"
+         (mouseleave)="mouseLeftItemEvent.emit(item)"
+         (mouseenter)="mouseEnteredItemEvent.emit(item)"
          [ngStyle]="{'cursor': item.cursor ? item.cursor : options.cursor}"
          [style.opacity]="editedItem && editedItem != item ? options.disabledOpacity : 1"
          [style.borderWidth.px]="item.selected && item != selectedItem ?

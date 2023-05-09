@@ -1,0 +1,26 @@
+<list-content [list]="list"
+              [options]="options"
+              (selectedItemsEvent)="selectedItemsEvent.emit($event)"
+              (pressedEnterKeyEvent)="pressedEnterKeyEvent.emit($event)"
+              (requestedPageLoadEvent)="requestedPageLoadEvent.emit($event)"
+              (mouseLeftItemEvent)="mouseLeftItemEvent.emit($event); hoverItem = null!"
+              (mouseEnteredItemEvent)="mouseEnteredItemEvent.emit($event); hoverItem = $event">
+
+     <ng-template #template
+                    let-item="referenceItem"
+                    let-selectedItem="referenceSelectedItem">
+          
+          <div [style.paddingLeft.px]="options.indent"
+               [style.width.px]="item.iconFontContainerWidth ? item.iconFontContainerWidth: options.iconFontContainerWidth!"
+               [style.marginLeft.px]="-(item.selectionBorderWidth ? item.selectionBorderWidth: options.selectionBorderWidth!)"
+
+               [style.color]="item == hoverItem && item != selectedItem ?
+                                   (item.iconFontHoverColor ? item.iconFontHoverColor.toHex() : options.iconFontHoverColor!.toHex()) :
+                              item == selectedItem ?
+                                   (item.iconFontSelectedColor ? item.iconFontSelectedColor.toHex() : options.iconFontSelectedColor!.toHex()) :
+                                   (item.iconFontColor ? item.iconFontColor.toHex() : options.iconFontColor!.toHex())">
+
+               <i [class]="item.iconFont"></i>
+          </div>
+     </ng-template>
+</list-content>

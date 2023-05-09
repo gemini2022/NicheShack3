@@ -1,6 +1,8 @@
 <div #listContainer
      class="list-container"
      (scroll)="onScroll(listContainer)"
+     (mousemove)="onMouseMove($event, listContainer)"
+     (mouseleave)="onMouseLeave()"
      (wheel)="onMouseWheel($event, listContainer)">
 
      <div *ngFor="let item of list"
@@ -10,6 +12,7 @@
           (mousedown)="onItemSelect(item)"
           [style.height.px]="options.itemHeight"
           (contextmenu)="$event.preventDefault();"
+          
           [ngClass]="{'primary-selection': item == selectedItem}"
           [ngStyle]="{'cursor': item.cursor ? item.cursor : options.cursor}"
           [style.borderWidth.px]="item.selectionBorderWidth ? item.selectionBorderWidth : options.selectionBorderWidth"

@@ -6,27 +6,12 @@
 </div>
 
 
-<div style="display: flex;">
+<div style="display: flex; padding: 20px;">
 
-      <div style="width: 300px; height: 260px; margin-right: 100px; background: rgb(51, 51, 51);">
-            <editable-list #editableList
-                           [list]="managerList"
-                           [options]="managerListOptions"
-                           (addedItemEvent)="onAddedItem($event)"
-                           (editedItemEvent)="onEditedItem($event)"
-                           (pastedListEvent)="onPastedList($event)"
-                           (unselectedListEvent)="onUnselectedList()"
-                           (deletedItemsEvent)="onDeletedItems($event)"
-                           (selectedItemsEvent)="onSelectedItems($event)"
-                           (pressedEnterKeyEvent)="onPressedEnterKey($event)"
-                           (pressedDeleteKeyEvent)="onPressedDeleteKey($event)"
-                           (rightClickedItemEvent)="onRightClickedItem($event)"
-                           (requestedPageLoadEvent)="onRequestedPageLoad($event)"
-                           (requestedItemCaseTypeEvent)="onRequestedItemCaseType($event)">
-            </editable-list>
-      </div>
+      
+      
 
-      <div style="width: 300px; height: 220px; margin-right: 100px;  background: rgba(22, 22, 22, 0.945);">
+      <div style="width: 300px; height: 226px; margin-right: 100px;  background: rgba(22, 22, 22, 0.945); border-radius: 5px; border: 1px solid #424242; padding: 2px;">
             <list #list
                   [list]="websiteList"
                   [options]="websiteListOptions"
@@ -35,6 +20,39 @@
                   (requestedPageLoadEvent)="onRequestedPageLoad($event)">
             </list>
       </div>
+
+
+      <div style="width: 164px; height: 186px; margin-right: 100px;  background: rgba(22, 22, 22, 0.945); border-radius: 5px; border: 1px solid #424242; padding: 2px;">
+            <icon-font-list #list
+                            [list]="iconFontList"
+                            [options]="iconFontListOptions"
+                            (selectedItemsEvent)="onSelectedItems($event)"
+                            (pressedEnterKeyEvent)="onPressedEnterKey($event)">
+            </icon-font-list>
+      </div>
+
+
+      <div style="background: #282828; padding: 10px; border: 1px solid #414141; border-radius: 4px; margin-right: 100px;">
+            <div style="width: 300px; height: 262px; background: #1e1e1e; border-radius: 3px; border: 1px solid black; border-right-color: #3c3c3c; border-bottom-color: #3c3c3c;">
+                  <editable-list #editableList
+                              [list]="managerList"
+                              [options]="managerListOptions"
+                              (addedItemEvent)="onAddedItem($event)"
+                              (editedItemEvent)="onEditedItem($event)"
+                              (pastedListEvent)="onPastedList($event)"
+                              (unselectedListEvent)="onUnselectedList()"
+                              (deletedItemsEvent)="onDeletedItems($event)"
+                              (selectedItemsEvent)="onSelectedItems($event)"
+                              (pressedEnterKeyEvent)="onPressedEnterKey($event)"
+                              (pressedDeleteKeyEvent)="onPressedDeleteKey($event)"
+                              (rightClickedItemEvent)="onRightClickedItem($event)"
+                              (requestedPageLoadEvent)="onRequestedPageLoad($event)"
+                              (requestedItemCaseTypeEvent)="onRequestedItemCaseType($event)">
+                  </editable-list>
+            </div>
+      </div>
+
+      
 
 
       <div style="background: #282828; padding: 10px; border: 1px solid #414141; border-radius: 4px;">
