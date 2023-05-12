@@ -8,6 +8,7 @@ export class EditableListOptions extends ListOptions {
     public selectable?: boolean = true;
     public unselectable?: boolean = true;
     public showSelection?: boolean = true;
+    public usingDblClick?: boolean = true;
     public disabledOpacity?: number = 0.25;
     public multiselectable?: boolean = true;
     public noSelectOnArrowKey?: boolean = false;
@@ -27,6 +28,7 @@ export class EditableListOptions extends ListOptions {
             if (editableListOptions.selectable != null) this.selectable = editableListOptions.selectable;
             if (editableListOptions.unselectable != null) this.unselectable = editableListOptions.unselectable;
             if (editableListOptions.showSelection != null) this.showSelection = editableListOptions.showSelection;
+            if (editableListOptions.usingDblClick != null) this.usingDblClick = editableListOptions.usingDblClick;
             if (editableListOptions.disabledOpacity != null) this.disabledOpacity = editableListOptions.disabledOpacity;
             if (editableListOptions.multiselectable != null) this.multiselectable = editableListOptions.multiselectable;
             if (editableListOptions.editedItemTextColor) this.editedItemTextColor = editableListOptions.editedItemTextColor;

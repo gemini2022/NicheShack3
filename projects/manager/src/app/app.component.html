@@ -26,6 +26,7 @@
             <icon-font-list #list
                             [list]="iconFontList"
                             [options]="iconFontListOptions"
+                            (itemClickedEvent)="onItemClicked($event)"
                             (selectedItemsEvent)="onSelectedItems($event)"
                             (pressedEnterKeyEvent)="onPressedEnterKey($event)">
             </icon-font-list>
@@ -69,6 +70,9 @@
 
 
 </div>
+
+
+
 
 
 <!-- <div style="padding: 100px;">

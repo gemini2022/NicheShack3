@@ -14,6 +14,7 @@ export class ListComponent {
   @Input() public options: ListOptions = new ListOptions();
 
   // Events
+  @Output() public itemClickedEvent: EventEmitter<ListItem> = new EventEmitter();
   @Output() public mouseLeftItemEvent: EventEmitter<ListItem> = new EventEmitter();
   @Output() public pressedEnterKeyEvent: EventEmitter<ListItem> = new EventEmitter();
   @Output() public mouseEnteredItemEvent: EventEmitter<ListItem> = new EventEmitter();

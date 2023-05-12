@@ -1,5 +1,6 @@
 <list-content [list]="list"
               [options]="options"
+              (itemClickedEvent)="itemClickedEvent.emit($event)"
               (selectedItemsEvent)="selectedItemsEvent.emit($event)"
               (pressedEnterKeyEvent)="pressedEnterKeyEvent.emit($event)"
               (requestedPageLoadEvent)="requestedPageLoadEvent.emit($event)"

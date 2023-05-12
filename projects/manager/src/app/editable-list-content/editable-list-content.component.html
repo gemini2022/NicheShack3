@@ -1,19 +1,19 @@
-<div #listContainer
-     class="list-container"
-     (scroll)="onScroll(listContainer)"
-     (wheel)="onMouseWheel($event, listContainer)"
-     (mousedown)="onListContainerMouseDown($event, listContainer)">
+<editable-list-container [options]="options"
+                         (listContainerScroll)="onScroll($event)"
+                         (itemDblClick)="list[$event] != null ? onItemDoubleClick() : null"
+                         (listContainerWheel)="onMouseWheel($event.wheelEvent, $event.listContainer)"
+                         (itemClick)="list[$event] != null ? itemClickedEvent.emit(list[$event]) : null"
+                         (itemMouseLeave)="list[$event] != null ? mouseLeftItemEvent.emit(list[$event]) : null"
+                         (itemMouseEnter)="list[$event] != null ? mouseEnteredItemEvent.emit(list[$event]) : null"
+                         (listContainerMouseDown)="onListContainerMouseDown($event.wheelEvent, $event.listContainer)"
+                         (itemMouseDown)="list[$event.itemIndex] != null ? onItemSelect(list[$event.itemIndex], $event.mouseEvent) : null">
 
     <div *ngFor="let item of list"
          #htmlItem
          class="item"
          tabindex="-1"
-         (dblclick)="onItemDoubleClick()"
          [style.height.px]="options.itemHeight"
-         (mousedown)="onItemSelect(item, $event)"
          (contextmenu)="$event.preventDefault();"
-         (mouseleave)="mouseLeftItemEvent.emit(item)"
-         (mouseenter)="mouseEnteredItemEvent.emit(item)"
          [ngStyle]="{'cursor': item.cursor ? item.cursor : options.cursor}"
          [style.opacity]="editedItem && editedItem != item ? options.disabledOpacity : 1"
          [style.borderWidth.px]="item.selected && item != selectedItem ?
@@ -66,4 +66,4 @@
             {{item.text}}
         </div>
     </div>
-</div>
+</editable-list-container>

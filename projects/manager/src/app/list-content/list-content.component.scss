@@ -1,11 +1,3 @@
-.list-container {
-    height: 100%;
-    overflow-y: auto;
-    position: relative;
-}
-
-
-
 .item {
     display: flex;
     outline: none;
@@ -36,7 +28,6 @@
     width: 100%;
     outline: none;
     background: none;
-    // margin-top: -1px;
     overflow: hidden;
     white-space: nowrap;
     border: 1px solid rgba(0, 0, 0, 0);

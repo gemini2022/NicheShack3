@@ -83,7 +83,7 @@ export class AppComponent {
     // this.managerList[4].secondarySelectionFillColor = new Color(255, 0, 0, 1);
     // this.managerList[4].secondarySelectionBorderColor = new Color(255, 0, 0, 1);
 
-    this.iconFontList[4].iconFontColor = new Color(255, 0, 0, 1);
+    // this.iconFontList[4].iconFontColor = new Color(255, 0, 0, 1);
   }
 
 
@@ -98,6 +98,9 @@ export class AppComponent {
   }
 
 
+  onItemClicked(item: ListItem) {
+    console.log(item)
+  }
 
 
   addItem() {

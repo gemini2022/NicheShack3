@@ -1,18 +1,17 @@
-<div #listContainer
-     class="list-container"
-     (scroll)="onScroll(listContainer)"
-     (mousemove)="onMouseMove($event, listContainer)"
-     (mouseleave)="onMouseLeave()"
-     (wheel)="onMouseWheel($event, listContainer)">
-
+<list-container [options]="options"
+                (listContainerScroll)="onScroll($event)"
+                (listContainerWheel)="onMouseWheel($event.wheelEvent, $event.listContainer)"
+                (itemClick)="list[$event] != null ? itemClickedEvent.emit(list[$event]) : null"
+                (itemMouseLeave)="list[$event] != null ? mouseLeftItemEvent.emit(list[$event]) : null"
+                (itemMouseEnter)="list[$event] != null ? mouseEnteredItemEvent.emit(list[$event]) : null"
+                (itemMouseDown)="list[$event.itemIndex] != null ? onItemSelect(list[$event.itemIndex]) : null">
+          
      <div *ngFor="let item of list"
           #htmlItem
           class="item"
           tabindex="-1"
-          (mousedown)="onItemSelect(item)"
           [style.height.px]="options.itemHeight"
           (contextmenu)="$event.preventDefault();"
-          
           [ngClass]="{'primary-selection': item == selectedItem}"
           [ngStyle]="{'cursor': item.cursor ? item.cursor : options.cursor}"
           [style.borderWidth.px]="item.selectionBorderWidth ? item.selectionBorderWidth : options.selectionBorderWidth"
@@ -28,11 +27,11 @@
           <div #htmlItemText
                tabindex="-1"
                class="item-text"
+               [style.marginLeft.px]="-1"
                [style.lineHeight.px]="options.itemHeight! - 2"
                [style.fontSize.px]="item.fontSize ? item.fontSize : options.fontSize"
-               [style.fontFamily]="item.fontFamily ? item.fontFamily : options.fontFamily"
-               [style.marginLeft.px]="-1">
+               [style.fontFamily]="item.fontFamily ? item.fontFamily : options.fontFamily">
                {{item.text}}
           </div>
      </div>
-</div>
+</list-container>

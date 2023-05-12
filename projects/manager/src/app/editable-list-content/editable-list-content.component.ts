@@ -56,7 +56,6 @@ export class EditableListContentComponent extends ListContentComponent{
   }
 
 
-
   public onItemSelect(item: EditableListItem, mouseEvent?: MouseEvent): void {
     if (this.stopItemSelectionPropagation) {
       this.stopItemSelectionPropagation = false;
@@ -405,10 +404,11 @@ export class EditableListContentComponent extends ListContentComponent{
 
 
   public onListContainerMouseDown(e: MouseEvent, listContainer: HTMLElement): void {
-    if (e.clientX > listContainer.clientWidth) {
+    if (e.clientX - listContainer.getBoundingClientRect().left >= listContainer.clientWidth) {
       this.stopMouseDownPropagation = true;
     }
   }
+
 
 
   protected setKeyDown(e: KeyboardEvent) {
